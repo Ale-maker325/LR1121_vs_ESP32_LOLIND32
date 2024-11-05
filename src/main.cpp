@@ -63,6 +63,7 @@ const uint32_t DIO_0_busy_2 = 39;
 const uint32_t DIO_1_1 = 16;
 const uint32_t DIO_1_2 = 34;
 
+// LR1121 radio1 = new Module(NSS_1, DIO_0_busy_1, RST_1, DIO_1_1); //Инициализируем экземпляр радио
 LR1121 radio1 = new Module(NSS_1, DIO_1_1, RST_1, DIO_0_busy_1); //Инициализируем экземпляр радио
 LR1121 radio2 = new Module(NSS_2, DIO_1_2, RST_2, DIO_0_busy_2); //Инициализируем экземпляр радио
 
@@ -496,6 +497,13 @@ void setup() {
   config_radio1.currentLimit = 100;
   config_radio1.preambleLength = 8;
   config_radio1.gain = 0;
+
+
+
+
+
+
+
   
   
   //Инициализируем радиотрансивер со значениями по-умолчанию
@@ -503,6 +511,8 @@ void setup() {
   Serial.print(F("Initializing ... "));
   //Инициализируем просто значениями по-умолчанию
   int state = radio1.begin();
+
+  // radio1
 
   if (state == RADIOLIB_ERR_NONE) {
     Serial.println(F("SUCCES!"));
