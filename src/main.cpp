@@ -53,19 +53,41 @@ boolean FUN_IS_ON = false;    //Логический флаг включения
 uint64_t count = 0;
 
 // Подключение радиотрансивера SX127.. в соответствии с разводкой  модуля для ESP32:
-const uint8_t FUN = 15;       //Пин управлением вентилятором охлаждения
-const uint32_t NSS_1 = 27;
-const uint32_t NSS_2 = 13;
-const uint32_t RST_1 = 26;
-const uint32_t RST_2 = 17;
-const uint32_t DIO_0_busy_1 = 36;
-const uint32_t DIO_0_busy_2 = 39;
-const uint32_t DIO_1_1 = 16;
-const uint32_t DIO_1_2 = 34;
+// const uint8_t FUN = 15;       //Пин управлением вентилятором охлаждения
+// const uint32_t NSS_1 = 27;
+// const uint32_t NSS_2 = 13;
+// const uint32_t RST_1 = 26;
+// const uint32_t RST_2 = 17;
+// const uint32_t DIO_0_busy_1 = 36;
+// const uint32_t DIO_0_busy_2 = 39;
+// const uint32_t DIO_1_1 = 16;
+// const uint32_t DIO_1_2 = 34;
 
-// LR1121 radio1 = new Module(NSS_1, DIO_0_busy_1, RST_1, DIO_1_1); //Инициализируем экземпляр радио
-LR1121 radio1 = new Module(NSS_1, DIO_1_1, RST_1, DIO_0_busy_1); //Инициализируем экземпляр радио
-LR1121 radio2 = new Module(NSS_2, DIO_1_2, RST_2, DIO_0_busy_2); //Инициализируем экземпляр радио
+
+
+const uint8_t FUN = 15;       //Пин управлением вентилятором охлаждения
+const uint32_t NSS_PIN_1 = 27;
+const uint32_t IRQ_PIN_1 = 16;
+const uint32_t NRST_PIN_1 = 26;
+const uint32_t BUSY_PIN_1 = 36;
+// const uint32_t NSS_2 = 13;
+// const uint32_t RST_2 = 17;
+// const uint32_t DIO_0_busy_2 = 39;
+// const uint32_t DIO_1_2 = 34;
+
+
+
+LR1121 radio1 = new Module(NSS_PIN_1, IRQ_PIN_1, NRST_PIN_1, BUSY_PIN_1); //Инициализируем экземпляр радио
+//LR1121 radio2 = new Module(NSS_2, DIO_1_2, RST_2, DIO_0_busy_2); //Инициализируем экземпляр радио
+
+
+
+// const uint32_t NSS_PIN = 16;
+// const uint32_t IRQ_PIN = 15;
+// const uint32_t NRST_PIN = 2;
+// const uint32_t BUSY_PIN = 17;
+
+// LR1121 radio1 = new Module(NSS_PIN, IRQ_PIN, NRST_PIN, BUSY_PIN); //Инициализируем экземпляр радио
 
  
 
@@ -442,13 +464,15 @@ void receive_and_print_data()
 
 
 
-// // установите конфигурацию радиочастотного переключателя для Wio WM1110
-// // Wio WM1110 использует DIO5 и DIO6 для радиочастотного переключения.
-// // ПРИМЕЧАНИЕ: другие платы могут отличаться!
+// установите конфигурацию радиочастотного переключателя для Wio WM1110
+// Wio WM1110 использует DIO5 и DIO6 для радиочастотного переключения.
+// ПРИМЕЧАНИЕ: другие платы могут отличаться!
 // static const uint32_t rfswitch_dio_pins[] = { 
 //   RADIOLIB_LR11X0_DIO5, RADIOLIB_LR11X0_DIO6,
 //   RADIOLIB_NC, RADIOLIB_NC, RADIOLIB_NC
 // };
+
+
 
 // static const Module::RfSwitchMode_t rfswitch_table[] = {
 //   // mode                  DIO5  DIO6 
@@ -473,7 +497,7 @@ void setup() {
   //Инициализируем сериал-монитор со скоростью 115200
   Serial.begin(115200);
 
-  
+    
   //инициализируем дисплей
   displayInit();
   Serial.println("...display is init");
@@ -485,7 +509,7 @@ void setup() {
   
   
   // установить конфигурацию управления радиочастотным переключателем, это необходимо сделать до вызова метода Begin()
-  // radio.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table);
+  // radio1.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table);
   
     
   
@@ -502,45 +526,19 @@ void setup() {
 
 
 
-
+  
 
 
 
   
-  radio1.setFrequency(434);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   //Инициализируем радиотрансивер со значениями по-умолчанию
   Serial.println(" ");
   Serial.print(F("Initializing radio... "));
   //Инициализируем просто значениями по-умолчанию
-  int state = radio1.begin();
+  //int state = radio1.begin();
+  int state = radio1.begin(434.0, 125.0, 9, 7, RADIOLIB_LR11X0_LORA_SYNC_WORD_PRIVATE, 10, 8, 1.6);
+  //radio1.explicitHeader();
+  //radio1.setCRC(2);
 
   // radio1
 
@@ -560,7 +558,8 @@ void setup() {
 
     while (true);
   }
-    
+
+  Serial.println(F("........................................................."));
     
   //Устанавливаем наши значения, определённые ранее в структуре config_radio1
   radio_setSettings(radio1);
