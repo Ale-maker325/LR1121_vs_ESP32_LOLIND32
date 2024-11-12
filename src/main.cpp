@@ -17,6 +17,8 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
+#define RADIO_1             //Раскомментировать если будет использован только один модем LR1121
+//#define RADIO_2             //Раскомментировать если будет использовано два модема LR1121
 
 
 //#define TEST                    //раскомментировать, если модуль будет прошиваться для общей проверки работоспособности
@@ -49,6 +51,9 @@ IRAM_ATTR void setFlag_1(void) {
   operationDone_1 = true;
 }
 
+
+
+#ifdef RADIO_2
 //Флаг окончания операции отправки/получения модема №2 чтобы указать, что пакет был отправлен или получен
 volatile bool operationDone_2 = false;
 
@@ -58,7 +63,7 @@ IRAM_ATTR void setFlag_2(void) {
 // мы отправили или получили пакет, установите флаг
   operationDone_2 = true;
 }
-
+#endif
 
 
 
@@ -90,23 +95,19 @@ const uint32_t IRQ_PIN_1 = 16;
 const uint32_t NRST_PIN_1 = 26;
 const uint32_t BUSY_PIN_1 = 36;
 
+LR1121 radio1 = new Module(NSS_PIN_1, IRQ_PIN_1, NRST_PIN_1, BUSY_PIN_1); //Инициализируем экземпляр радио
+
+#ifdef RADIO_2
 const uint32_t NSS_PIN_2 = 13;
 const uint32_t IRQ_PIN_2 = 34;
 const uint32_t NRST_PIN_2 = 17;
 const uint32_t BUSY_PIN_2 = 39;
-
-
-LR1121 radio1 = new Module(NSS_PIN_1, IRQ_PIN_1, NRST_PIN_1, BUSY_PIN_1); //Инициализируем экземпляр радио
 LR1121 radio2 = new Module(NSS_PIN_2, IRQ_PIN_2, NRST_PIN_2, BUSY_PIN_2); //Инициализируем экземпляр радио
+#endif
 
 
 
-// const uint32_t NSS_PIN = 16;
-// const uint32_t IRQ_PIN = 15;6
-// const uint32_t NRST_PIN = 2;
-// const uint32_t BUSY_PIN = 17;
 
-// LR1121 radio1 = new Module(NSS_PIN, IRQ_PIN, NRST_PIN, BUSY_PIN); //Инициализируем экземпляр радио
 
  
 
@@ -129,8 +130,8 @@ String RECEIVE = F("RECEIVE: ");  //Строка сообщения для пр�
 
 
 
-int state_1 = RADIOLIB_ERR_NONE;; // Переменная, хранящая код состояния передачи/приёма
-int state_2 = RADIOLIB_ERR_NONE;; // Переменная, хранящая код состояния передачи/приёма
+int state_1 = RADIOLIB_ERR_NONE; // Переменная, хранящая код состояния передачи/приёма
+int state_2 = RADIOLIB_ERR_NONE; // Переменная, хранящая код состояния передачи/приёма
 uint8_t LED_PIN = 5;           // Пин для управления индикацией светодиодом
 
 
@@ -250,15 +251,6 @@ void radio_setSettings(LR1121 radio, String radio_name)
   Serial.print(F("Set setOutputPower = "));
   Serial.println(config_radio1.outputPower); 
 
-  // // установить предел защиты по току (допустимый диапазон 45 - 240 мА)
-  // // ПРИМЕЧАНИЕ: установить значение 0 для отключения защиты от перегрузки по току
-  // if (radio.setCurrentLimit(config_radio1.currentLimit) == RADIOLIB_ERR_INVALID_CURRENT_LIMIT) {
-  //   Serial.println(F("Selected current limit is invalid for this module!"));
-  //   while (true);
-  // }
-  // Serial.print(F("Set currentLimit = "));
-  // Serial.println(config_radio1.currentLimit);
-
   // установить длину преамбулы (допустимый диапазон 6 - 65535)
   if (radio.setPreambleLength(config_radio1.preambleLength) == RADIOLIB_ERR_INVALID_PREAMBLE_LENGTH) {
     Serial.println(F("Selected preamble length is invalid for this module!"));
@@ -267,15 +259,7 @@ void radio_setSettings(LR1121 radio, String radio_name)
   Serial.print(F("Set preambleLength = "));
   Serial.println(config_radio1.preambleLength);
 
-  // Установить регулировку усилителя (допустимый диапазон 1 - 6, где 1 - максимальный рост)
-  // ПРИМЕЧАНИЕ: установить значение 0, чтобы включить автоматическую регулировку усиления
-  //   оставьте в 0, если вы не знаете, что вы делаете
-  // if (radio.setGain(config_radio1.gain) == RADIOLIB_ERR_INVALID_GAIN) {
-  //   Serial.println(F("Selected gain is invalid for this module!"));
-  //   while (true);
-  // }
-  // Serial.print(F("Set Gain = "));
-  // Serial.println(config_radio1.gain);
+  
 
   Serial.println(F("All settings successfully changed!"));
 }
@@ -298,8 +282,10 @@ void transmit_and_print_data(String &transmit_str)
   Serial.print(F("Send packet ... "));
 
   state_1 = radio1.startTransmit(transmit_str);
-  state_2 = radio2.startTransmit(transmit_str);
 
+  #ifdef RADIO_2
+  state_2 = radio2.startTransmit(transmit_str);
+  #endif
 
   //Если передача успешна, выводим сообщение в сериал-монитор
   if (state_1 == RADIOLIB_ERR_NONE) {
@@ -313,51 +299,6 @@ void transmit_and_print_data(String &transmit_str)
     //Выводим в сериал данные отправленного пакета
     Serial.print(F("Data:\t\t"));
     Serial.println(transmit_str);
-
-    //Печатаем RSSI (Received Signal Strength Indicator)
-    // float rssi_data = radio1.getRSSI();
-    // String RSSI_DATA = (String)rssi_data;
-          
-    // Serial.print(F("\t\t\t"));
-    // Serial.print(RSSI);
-    // Serial.print(RSSI_DATA);
-    // Serial.println(dBm);
-          
-    // display.setCursor(0, 16);
-    // display.print(RSSI);
-    // display.print(RSSI_DATA);
-    // display.print(dBm);
-              
-
-    // печатаем SNR (Signal-to-Noise Ratio)
-    // float snr_data = radio1.getSNR();
-    // String SNR_DATA = (String)snr_data;
-
-    // Serial.print(F("\t\t\t"));
-    // Serial.print(SNR);
-    // Serial.print(SNR_DATA);
-    // Serial.println(dB);
-
-    // display.setCursor(0, 27);
-    // display.print(SNR);
-    // display.print(SNR_DATA);
-    // display.print(dB);
-
-
-    // печатаем скорость передачи данных последнего пакета (бит в секунду)
-    // float data_rate = radio1.getDataRate();
-    // float data_rate = radio1.getDataRate();
-    // String DATA_RATE = (String) data_rate;
-
-    // Serial.print(F("\t\t\t"));
-    // Serial.print(DT_RATE);
-    // Serial.print(DATA_RATE);
-    // Serial.println(BS);
-
-    // display.setCursor(0, 38);
-    // display.print(DT_RATE);
-    // display.print(DATA_RATE);
-    // display.print(BS);
 
     display.display();
     display.clearDisplay();
@@ -376,6 +317,7 @@ void transmit_and_print_data(String &transmit_str)
 
   }
 
+  #ifdef RADIO_2
   //Если передача успешна, выводим сообщение в сериал-монитор
   if (state_2 == RADIOLIB_ERR_NONE) {
     //Выводим сообщение об успешной передаче
@@ -405,6 +347,7 @@ void transmit_and_print_data(String &transmit_str)
     display.display();
 
   }
+  #endif
 
 }
   
@@ -523,24 +466,24 @@ void receive_and_print_data()
 // установите конфигурацию радиочастотного переключателя для Wio WM1110
 // Wio WM1110 использует DIO5 и DIO6 для радиочастотного переключения.
 // ПРИМЕЧАНИЕ: другие платы могут отличаться!
-// static const uint32_t rfswitch_dio_pins[] = { 
-//   RADIOLIB_LR11X0_DIO5, RADIOLIB_LR11X0_DIO6,
-//   RADIOLIB_NC, RADIOLIB_NC, RADIOLIB_NC
-// };
+static const uint32_t rfswitch_dio_pins[] = { 
+  RADIOLIB_LR11X0_DIO7, RADIOLIB_LR11X0_DIO8,
+  RADIOLIB_NC, RADIOLIB_NC, RADIOLIB_NC
+};
 
 
 
-// static const Module::RfSwitchMode_t rfswitch_table[] = {
-//   // mode                  DIO5  DIO6 
-//   { LR11x0::MODE_STBY,   { LOW,  LOW  } },
-//   { LR11x0::MODE_RX,     { HIGH, LOW  } },
-//   { LR11x0::MODE_TX,     { HIGH, HIGH } },
-//   { LR11x0::MODE_TX_HP,  { LOW,  HIGH } },
-//   { LR11x0::MODE_TX_HF,  { LOW,  LOW  } },
-//   { LR11x0::MODE_GNSS,   { LOW,  LOW  } },
-//   { LR11x0::MODE_WIFI,   { LOW,  LOW  } },
-//   END_OF_MODE_TABLE,
-// };
+static const Module::RfSwitchMode_t rfswitch_table[] = {
+  // mode                  DIO7  DIO8 
+  { LR11x0::MODE_STBY,   { LOW,  LOW  } },
+  { LR11x0::MODE_RX,     { HIGH, LOW  } },
+  { LR11x0::MODE_TX,     { HIGH, HIGH } },
+  { LR11x0::MODE_TX_HP,  { LOW,  HIGH } },
+  { LR11x0::MODE_TX_HF,  { LOW,  LOW  } },
+  { LR11x0::MODE_GNSS,   { LOW,  LOW  } },
+  { LR11x0::MODE_WIFI,   { LOW,  LOW  } },
+  END_OF_MODE_TABLE,
+};
 
 
 
@@ -551,7 +494,7 @@ void receive_and_print_data()
 
 void setup() {
   //Инициализируем сериал-монитор со скоростью 115200
-  Serial.begin(115200);
+  Serial.begin(9600);
 
     
   //инициализируем дисплей
@@ -565,7 +508,7 @@ void setup() {
   
   
   // установить конфигурацию управления радиочастотным переключателем, это необходимо сделать до вызова метода Begin()
-  // radio1.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table);
+  radio1.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table);
   
     
   
@@ -575,11 +518,12 @@ void setup() {
   config_radio1.spreadingFactor = 9;
   config_radio1.codingRate = 7;
   config_radio1.syncWord = RADIOLIB_LR11X0_LORA_SYNC_WORD_PRIVATE;
-  config_radio1.outputPower = 17;
+  config_radio1.outputPower = 22;
   config_radio1.currentLimit = 100;
   config_radio1.preambleLength = 8;
   config_radio1.gain = 0;
 
+  #ifdef RADIO_2
   //Задаём параметры конфигурации радиотрансивера 2
   config_radio2.frequency = 455;
   config_radio2.bandwidth = 125;
@@ -590,7 +534,7 @@ void setup() {
   config_radio2.currentLimit = 100;
   config_radio2.preambleLength = 8;
   config_radio2.gain = 0;
-
+  #endif
   
 
 
@@ -632,7 +576,7 @@ void setup() {
   
   
   
-  
+  #ifdef RADIO_2
   //Инициализируем радиотрансивер 2 со значениями по-умолчанию
   Serial.println(" ");
   Serial.print(F("Initializing radio 2 ... "));
@@ -663,12 +607,15 @@ void setup() {
     while (true);
   }
 
+  #endif
+
   Serial.println(F("........................................................."));
     
   //Устанавливаем наши значения, определённые ранее в структуре config_radio1
   radio_setSettings(radio1, "1");
+  #ifdef RADIO_2
   radio_setSettings(radio2, "2");
-
+  #endif
   
   
   
@@ -705,8 +652,11 @@ void setup() {
 
     //Устанавливаем функцию, которая будет вызываться при отправке пакета данных модемом №1
     radio1.setPacketSentAction(setFlag_1);
+
+    #ifdef RADIO_2
     //Устанавливаем функцию, которая будет вызываться при отправке пакета данных модемом №2
     radio2.setPacketSentAction(setFlag_2);
+    #endif
 
 
     //Начинаем передачу пакетов
@@ -797,6 +747,7 @@ void loop() {
       
       
     }
+    #ifdef RADIO_2
     if(operationDone_2) {
       
       //Сбрасываем сработавший флаг прерывания
@@ -809,6 +760,7 @@ void loop() {
       
       
     }
+    #endif
   #endif
 
   #ifdef TEST
