@@ -463,22 +463,48 @@ void receive_and_print_data()
 
 
 
-// установите конфигурацию радиочастотного переключателя для Wio WM1110
-// Wio WM1110 использует DIO5 и DIO6 для радиочастотного переключения.
-// ПРИМЕЧАНИЕ: другие платы могут отличаться!
+// // установите конфигурацию радиочастотного переключателя для Wio WM1110
+// // Wio WM1110 использует DIO5 и DIO6 для радиочастотного переключения.
+// // ПРИМЕЧАНИЕ: другие платы могут отличаться!
+// static const uint32_t rfswitch_dio_pins[] = { 
+//   RADIOLIB_LR11X0_DIO7, RADIOLIB_LR11X0_DIO8,
+//   RADIOLIB_NC, RADIOLIB_NC, RADIOLIB_NC
+// };
+
+
+
+// static const Module::RfSwitchMode_t rfswitch_table[] = {
+//   // mode                  DIO7  DIO8 
+//   { LR11x0::MODE_STBY,   { LOW,  LOW  } },
+//   { LR11x0::MODE_RX,     { HIGH, LOW  } },
+//   { LR11x0::MODE_TX,     { HIGH, HIGH } },
+//   { LR11x0::MODE_TX_HP,  { LOW,  HIGH } },
+//   { LR11x0::MODE_TX_HF,  { LOW,  LOW  } },
+//   { LR11x0::MODE_GNSS,   { LOW,  LOW  } },
+//   { LR11x0::MODE_WIFI,   { LOW,  LOW  } },
+//   END_OF_MODE_TABLE,
+// };
+
+
+
+
+
+
+
+// set RF switch configuration for Wio WM1110
+// Wio WM1110 uses DIO5 and DIO6 for RF switching
+// NOTE: other boards may be different!
 static const uint32_t rfswitch_dio_pins[] = { 
-  RADIOLIB_LR11X0_DIO7, RADIOLIB_LR11X0_DIO8,
-  RADIOLIB_NC, RADIOLIB_NC, RADIOLIB_NC
+  RADIOLIB_NC, RADIOLIB_NC,
+  RADIOLIB_LR11X0_DIO7, RADIOLIB_LR11X0_DIO8, RADIOLIB_NC
 };
 
-
-
 static const Module::RfSwitchMode_t rfswitch_table[] = {
-  // mode                  DIO7  DIO8 
+  // mode                  DIO5  DIO6 
   { LR11x0::MODE_STBY,   { LOW,  LOW  } },
-  { LR11x0::MODE_RX,     { HIGH, LOW  } },
-  { LR11x0::MODE_TX,     { HIGH, HIGH } },
-  { LR11x0::MODE_TX_HP,  { LOW,  HIGH } },
+  { LR11x0::MODE_RX,     { LOW, HIGH  } },
+  { LR11x0::MODE_TX,     { HIGH, LOW } },
+  { LR11x0::MODE_TX_HP,  { HIGH,  LOW } },
   { LR11x0::MODE_TX_HF,  { LOW,  LOW  } },
   { LR11x0::MODE_GNSS,   { LOW,  LOW  } },
   { LR11x0::MODE_WIFI,   { LOW,  LOW  } },
@@ -490,12 +516,20 @@ static const Module::RfSwitchMode_t rfswitch_table[] = {
 
 
 
+// #include "esp_clk.h"
+
+// void displaySlowClockCalibration() { uint32_t slow_clk_cal = esp_clk_slowclk_cal_get(); Serial.print("Slow Clock Calibration Value: "); Serial.print(slow_clk_cal); Serial.println(" microseconds"); }
+// void displayCpuFrequency() { int cpu_freq = esp_clk_cpu_freq(); Serial.print("CPU Frequency: "); Serial.print(cpu_freq); Serial.println(" Hz"); }
+// void displayApbFrequency() { int apb_freq = esp_clk_apb_freq(); Serial.print("APB Frequency: "); Serial.print(apb_freq); Serial.println(" Hz"); }
+// void displayRtcTime() { uint64_t rtc_time = esp_clk_rtc_time(); Serial.print("RTC Time: "); Serial.print(rtc_time); Serial.println(" microseconds"); }
+
 
 
 void setup() {
   //Инициализируем сериал-монитор со скоростью 115200
   Serial.begin(9600);
 
+  //Serial.printf("Chip Model %s, ChipRevision %d, Cpu Freq %d, SDK Version %s\n", ESP.getChipModel(), ESP.getChipRevision(), ESP.getCpuFreqMHz(), ESP.getSdkVersion());
     
   //инициализируем дисплей
   displayInit();
@@ -504,7 +538,7 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);      //Контакт управления светодиодом
   pinMode(FUN, OUTPUT);          //Контакт управления вентилятором охлаждения
 
-
+  
   
   
   // установить конфигурацию управления радиочастотным переключателем, это необходимо сделать до вызова метода Begin()
@@ -513,12 +547,12 @@ void setup() {
     
   
   //Задаём параметры конфигурации радиотрансивера 1
-  config_radio1.frequency = 460;
+  config_radio1.frequency = 434;
   config_radio1.bandwidth = 125;
   config_radio1.spreadingFactor = 9;
   config_radio1.codingRate = 7;
   config_radio1.syncWord = RADIOLIB_LR11X0_LORA_SYNC_WORD_PRIVATE;
-  config_radio1.outputPower = 22;
+  config_radio1.outputPower = 10;
   config_radio1.currentLimit = 100;
   config_radio1.preambleLength = 8;
   config_radio1.gain = 0;
