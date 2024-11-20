@@ -304,6 +304,8 @@ void transmit_and_print_data(String &transmit_str)
     display.clearDisplay();
 
     digitalWrite(LED_PIN, LOW);     //Включаем светодиод, сигнализация об передаче/приёма пакета
+
+    
           
   } else {
     //Если были проблемы при передаче, сообщаем об этом
@@ -316,6 +318,10 @@ void transmit_and_print_data(String &transmit_str)
     display.display();
 
   }
+
+  //state_1 = radio1.finishTransmit();
+
+
 
   #ifdef RADIO_2
   //Если передача успешна, выводим сообщение в сериал-монитор
@@ -528,6 +534,7 @@ static const Module::RfSwitchMode_t rfswitch_table[] = {
 void setup() {
   //Инициализируем сериал-монитор со скоростью 115200
   Serial.begin(9600);
+  pinMode(15, OUTPUT);
 
   //Serial.printf("Chip Model %s, ChipRevision %d, Cpu Freq %d, SDK Version %s\n", ESP.getChipModel(), ESP.getChipRevision(), ESP.getCpuFreqMHz(), ESP.getSdkVersion());
     
@@ -751,9 +758,11 @@ void setup() {
 
 
 void loop() {
-
-  delay(1000);
+  digitalWrite(15, LOW);
+  delay(100);
   digitalWrite(LED_PIN, HIGH); //Выключаем светодиод, сигнализация об окончании передачи/приёма пакета
+  digitalWrite(15, HIGH);
+
 
   #ifdef RECEIVER   //Если определен модуль как приёмник
     //проверяем, была ли предыдущая передача успешной
