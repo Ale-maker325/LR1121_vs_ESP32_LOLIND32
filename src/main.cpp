@@ -90,10 +90,10 @@ uint64_t count = 0;
 
 const uint8_t FUN = 15;       //Пин управлением вентилятором охлаждения
 
-const uint32_t NSS_PIN_1 = 27;
-const uint32_t IRQ_PIN_1 = 16;
-const uint32_t NRST_PIN_1 = 26;
-const uint32_t BUSY_PIN_1 = 36;
+const uint32_t NSS_PIN_1 = 17;
+const uint32_t IRQ_PIN_1 = 25;
+const uint32_t NRST_PIN_1 = 14;
+const uint32_t BUSY_PIN_1 = 26;
 
 LR1121 radio1 = new Module(NSS_PIN_1, IRQ_PIN_1, NRST_PIN_1, BUSY_PIN_1); //Инициализируем экземпляр радио
 
@@ -464,6 +464,45 @@ void receive_and_print_data()
 
 
 
+void printVersions() {
+  LR11x0VersionInfo_t version;
+  Serial.print(F("[LR1110] Reading firmware versions ... "));
+  int16_t state = radio1.getVersionInfo(&version);
+  if (state == RADIOLIB_ERR_NONE) {
+    Serial.println(F("success!"));
+
+    Serial.print(F("[LR1110] Device: "));
+    Serial.println(version.device);
+
+    Serial.print(F("[LR1110] Base firmware: "));
+    Serial.print(version.fwMajor);
+    Serial.print('.');
+    Serial.println(version.fwMinor);
+
+    Serial.print(F("[LR1110] WiFi firmware: "));
+    Serial.print(version.fwMajorWiFi);
+    Serial.print('.');
+    Serial.println(version.fwMinorWiFi);
+
+    Serial.print(F("[LR1110] GNSS firmware: "));
+    Serial.print(version.fwGNSS);
+    Serial.print('.');
+    Serial.println(version.almanacGNSS);
+
+  } else {
+    Serial.print(F("failed, code "));
+    Serial.println(state);
+    while (true) { delay(10); }
+  
+  }
+
+}
+
+
+
+
+
+
 
 
 
@@ -507,13 +546,13 @@ static const uint32_t rfswitch_dio_pins[] = {
 
 static const Module::RfSwitchMode_t rfswitch_table[] = {
   // mode                  DIO5  DIO6 
-  { LR11x0::MODE_STBY,   { LOW,  LOW  } },
-  { LR11x0::MODE_RX,     { LOW, HIGH  } },
-  { LR11x0::MODE_TX,     { HIGH, LOW } },
-  { LR11x0::MODE_TX_HP,  { HIGH,  LOW } },
-  { LR11x0::MODE_TX_HF,  { LOW,  LOW  } },
-  { LR11x0::MODE_GNSS,   { LOW,  LOW  } },
-  { LR11x0::MODE_WIFI,   { LOW,  LOW  } },
+  { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
+  { LR11x0::MODE_RX,     { LOW, HIGH, LOW, HIGH  } },
+  { LR11x0::MODE_TX,     { HIGH, LOW, HIGH, LOW } },
+  { LR11x0::MODE_TX_HP,  { HIGH, LOW, HIGH, LOW } },
+  { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
+  { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
+  { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
   END_OF_MODE_TABLE,
 };
 
@@ -749,6 +788,8 @@ void setup() {
     }
   #endif
 
+
+  printVersions();
   Serial.println(" ");
 
   
@@ -759,7 +800,7 @@ void setup() {
 
 void loop() {
   digitalWrite(15, LOW);
-  delay(100);
+  delay(500 );
   digitalWrite(LED_PIN, HIGH); //Выключаем светодиод, сигнализация об окончании передачи/приёма пакета
   digitalWrite(15, HIGH);
 
@@ -790,6 +831,46 @@ void loop() {
       
       
     }
+
+    // check CAD result
+    int state = radio1.getChannelScanResult();
+
+    if (state == RADIOLIB_LORA_DETECTED) {
+      // LoRa packet was detected
+      Serial.println(F("[LR1110] Packet detected!"));
+
+    } else if (state == RADIOLIB_CHANNEL_FREE) {
+      // channel is free
+      Serial.println(F("[LR1110] Channel is free!"));
+
+    } else {
+      // some other error occurred
+      Serial.print(F("[LR1110] Failed, code "));
+      Serial.println(state);
+
+    }
+
+    Serial.println(F("[LR1110] Scanning channel for LoRa transmission ... "));
+
+    // start scanning current channel
+    state = radio1.scanChannel();
+
+    if (state == RADIOLIB_LORA_DETECTED) {
+      // LoRa preamble was detected
+      Serial.println(F("detected!"));
+
+    } else if (state == RADIOLIB_CHANNEL_FREE) {
+      // no preamble was detected, channel is free
+      Serial.println(F("channel is free!"));
+
+    } else {
+      // some other error occurred
+      Serial.print(F("failed, code "));
+      Serial.println(state);
+
+    }
+
+
     #ifdef RADIO_2
     if(operationDone_2) {
       
