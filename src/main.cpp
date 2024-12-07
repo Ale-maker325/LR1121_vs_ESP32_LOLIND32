@@ -90,10 +90,10 @@ uint64_t count = 0;
 
 const uint8_t FUN = 15;       //Пин управлением вентилятором охлаждения
 
-const uint32_t NSS_PIN_1 = 27;
-const uint32_t IRQ_PIN_1 = 16;
-const uint32_t NRST_PIN_1 = 26;
-const uint32_t BUSY_PIN_1 = 36;
+const uint32_t NSS_PIN_1 = 17;
+const uint32_t IRQ_PIN_1 = 25;
+const uint32_t NRST_PIN_1 = 14;
+const uint32_t BUSY_PIN_1 = 26;
 
 LR1121 radio1 = new Module(NSS_PIN_1, IRQ_PIN_1, NRST_PIN_1, BUSY_PIN_1); //Инициализируем экземпляр радио
 
@@ -499,6 +499,13 @@ static const uint32_t rfswitch_dio_pins[] = {
   RADIOLIB_LR11X0_DIO7, RADIOLIB_LR11X0_DIO8, RADIOLIB_NC
 };
 
+
+// static const uint32_t rfswitch_dio_pins[] = { 
+//   RADIOLIB_LR11X0_DIO7, RADIOLIB_LR11X0_DIO8, RADIOLIB_NC, RADIOLIB_NC,
+//    RADIOLIB_NC
+// };
+
+
 static const Module::RfSwitchMode_t rfswitch_table[] = {
   // mode                  DIO5  DIO6 
   { LR11x0::MODE_STBY,   { LOW,  LOW  } },
@@ -539,7 +546,8 @@ void setup() {
   pinMode(FUN, OUTPUT);          //Контакт управления вентилятором охлаждения
 
   
-  
+  // pinMode(13, OUTPUT);
+  // digitalWrite(13, LOW);
   
   // установить конфигурацию управления радиочастотным переключателем, это необходимо сделать до вызова метода Begin()
   radio1.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table);
