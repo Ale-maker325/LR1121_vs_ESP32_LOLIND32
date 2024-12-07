@@ -304,6 +304,8 @@ void transmit_and_print_data(String &transmit_str)
     display.clearDisplay();
 
     digitalWrite(LED_PIN, LOW);     //Включаем светодиод, сигнализация об передаче/приёма пакета
+
+    
           
   } else {
     //Если были проблемы при передаче, сообщаем об этом
@@ -316,6 +318,10 @@ void transmit_and_print_data(String &transmit_str)
     display.display();
 
   }
+
+  //state_1 = radio1.finishTransmit();
+
+
 
   #ifdef RADIO_2
   //Если передача успешна, выводим сообщение в сериал-монитор
@@ -458,6 +464,45 @@ void receive_and_print_data()
 
 
 
+void printVersions() {
+  LR11x0VersionInfo_t version;
+  Serial.print(F("[LR1110] Reading firmware versions ... "));
+  int16_t state = radio1.getVersionInfo(&version);
+  if (state == RADIOLIB_ERR_NONE) {
+    Serial.println(F("success!"));
+
+    Serial.print(F("[LR1110] Device: "));
+    Serial.println(version.device);
+
+    Serial.print(F("[LR1110] Base firmware: "));
+    Serial.print(version.fwMajor);
+    Serial.print('.');
+    Serial.println(version.fwMinor);
+
+    Serial.print(F("[LR1110] WiFi firmware: "));
+    Serial.print(version.fwMajorWiFi);
+    Serial.print('.');
+    Serial.println(version.fwMinorWiFi);
+
+    Serial.print(F("[LR1110] GNSS firmware: "));
+    Serial.print(version.fwGNSS);
+    Serial.print('.');
+    Serial.println(version.almanacGNSS);
+
+  } else {
+    Serial.print(F("failed, code "));
+    Serial.println(state);
+    while (true) { delay(10); }
+  
+  }
+
+}
+
+
+
+
+
+
 
 
 
@@ -508,13 +553,13 @@ static const uint32_t rfswitch_dio_pins[] = {
 
 static const Module::RfSwitchMode_t rfswitch_table[] = {
   // mode                  DIO5  DIO6 
-  { LR11x0::MODE_STBY,   { LOW,  LOW  } },
-  { LR11x0::MODE_RX,     { LOW, HIGH  } },
-  { LR11x0::MODE_TX,     { HIGH, LOW } },
-  { LR11x0::MODE_TX_HP,  { HIGH,  LOW } },
-  { LR11x0::MODE_TX_HF,  { LOW,  LOW  } },
-  { LR11x0::MODE_GNSS,   { LOW,  LOW  } },
-  { LR11x0::MODE_WIFI,   { LOW,  LOW  } },
+  { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
+  { LR11x0::MODE_RX,     { LOW, HIGH, LOW, HIGH  } },
+  { LR11x0::MODE_TX,     { HIGH, LOW, HIGH, LOW } },
+  { LR11x0::MODE_TX_HP,  { HIGH, LOW, HIGH, LOW } },
+  { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
+  { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
+  { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
   END_OF_MODE_TABLE,
 };
 
@@ -535,6 +580,7 @@ static const Module::RfSwitchMode_t rfswitch_table[] = {
 void setup() {
   //Инициализируем сериал-монитор со скоростью 115200
   Serial.begin(9600);
+  pinMode(15, OUTPUT);
 
   //Serial.printf("Chip Model %s, ChipRevision %d, Cpu Freq %d, SDK Version %s\n", ESP.getChipModel(), ESP.getChipRevision(), ESP.getCpuFreqMHz(), ESP.getSdkVersion());
     
@@ -750,6 +796,8 @@ void setup() {
     }
   #endif
 
+
+  printVersions();
   Serial.println(" ");
 
   
@@ -759,9 +807,11 @@ void setup() {
 
 
 void loop() {
-
-  delay(1000);
+  digitalWrite(15, LOW);
+  delay(500 );
   digitalWrite(LED_PIN, HIGH); //Выключаем светодиод, сигнализация об окончании передачи/приёма пакета
+  digitalWrite(15, HIGH);
+
 
   #ifdef RECEIVER   //Если определен модуль как приёмник
     //проверяем, была ли предыдущая передача успешной
@@ -789,6 +839,46 @@ void loop() {
       
       
     }
+
+    // check CAD result
+    int state = radio1.getChannelScanResult();
+
+    if (state == RADIOLIB_LORA_DETECTED) {
+      // LoRa packet was detected
+      Serial.println(F("[LR1110] Packet detected!"));
+
+    } else if (state == RADIOLIB_CHANNEL_FREE) {
+      // channel is free
+      Serial.println(F("[LR1110] Channel is free!"));
+
+    } else {
+      // some other error occurred
+      Serial.print(F("[LR1110] Failed, code "));
+      Serial.println(state);
+
+    }
+
+    Serial.println(F("[LR1110] Scanning channel for LoRa transmission ... "));
+
+    // start scanning current channel
+    state = radio1.scanChannel();
+
+    if (state == RADIOLIB_LORA_DETECTED) {
+      // LoRa preamble was detected
+      Serial.println(F("detected!"));
+
+    } else if (state == RADIOLIB_CHANNEL_FREE) {
+      // no preamble was detected, channel is free
+      Serial.println(F("channel is free!"));
+
+    } else {
+      // some other error occurred
+      Serial.print(F("failed, code "));
+      Serial.println(state);
+
+    }
+
+
     #ifdef RADIO_2
     if(operationDone_2) {
       
