@@ -156,7 +156,7 @@ void printStateResult(int &state, String &transmit_str, Radio_Number radioNumber
 void transmit_and_print_data(String &transmit_str)
 {
   display.clearDisplay();
-  
+
   //Посылаем пакет
   state_1 = radio1.startTransmit(transmit_str);
   //Ждём завершения передачи
@@ -392,7 +392,9 @@ void printVersions() {
 void radioBeginAll()
 {
   pinMode(NSS_PIN_1, OUTPUT);
+  #ifdef RADIO_2
   pinMode(NSS_PIN_2, OUTPUT);
+  #endif
   
   //Инициализируем радиотрансивер 1 со значениями по-умолчанию, заданными в
   //структуре LORA_CONFIGURATION
@@ -401,7 +403,9 @@ void radioBeginAll()
   Serial.println(F(" INIT....."));
 
   digitalWrite(NSS_PIN_1, LOW);
+  #ifdef RADIO_2
   digitalWrite(NSS_PIN_2, HIGH);
+  #endif
 
   //Инициализируем просто значениями по-умолчанию
   int state_1 = radio1.begin();
@@ -633,24 +637,24 @@ void setup() {
   
   #ifdef RECEIVER   //Если определена работа модуля как приёмника
 
-    //Устанавливаем функцию, которая будет вызываться при получении пакета данных
-    radio1.setPacketReceivedAction(setFlag);
+    // //Устанавливаем функцию, которая будет вызываться при получении пакета данных
+    // radio1.setPacketReceivedAction(setFlag);
 
-    //Начинаем слушать есть ли пакеты
-    Serial.print(F("[SX1278] Starting to listen ... "));
-    state = radio1.startReceive();
+    // //Начинаем слушать есть ли пакеты
+    // Serial.print(F("[SX1278] Starting to listen ... "));
+    // state = radio1.startReceive();
   
-    if (state == RADIOLIB_ERR_NONE) {
-      Serial.println(F("success!"));
-      digitalWrite(LED_PIN, LOW);     //Включаем светодиод, сигнализация об передаче/приёма пакета
-    } else {
-      Serial.print(F("failed, code: "));
-      Serial.println(state);
-      while (true);
-    }
+    // if (state == RADIOLIB_ERR_NONE) {
+    //   Serial.println(F("success!"));
+    //   digitalWrite(LED_PIN, LOW);     //Включаем светодиод, сигнализация об передаче/приёма пакета
+    // } else {
+    //   Serial.print(F("failed, code: "));
+    //   Serial.println(state);
+    //   while (true);
+    // }
 
-    //получаем данные
-    receive_and_print_data();
+    // //получаем данные
+    // receive_and_print_data();
 
        
   #endif
@@ -703,25 +707,25 @@ void setup() {
 
 
   #ifdef TEST
-    //Устанавливаем функцию, которая будет вызываться при получении пакета данных
-    radio1.setPacketReceivedAction(setFlag);
+    // //Устанавливаем функцию, которая будет вызываться при получении пакета данных
+    // radio1.setPacketReceivedAction(setFlag);
 
-    //Начинаем слушать есть ли пакеты
-    Serial.print(F("[SX1278] Starting to listen ... "));
-    state = radio1.startReceive();
+    // //Начинаем слушать есть ли пакеты
+    // Serial.print(F("[SX1278] Starting to listen ... "));
+    // state = radio1.startReceive();
 
-    if (state == RADIOLIB_ERR_NONE) {
-      Serial.println(F("success!"));
-      digitalWrite(LED_PIN, LOW);     //Включаем светодиод, сигнализация об передаче/приёма пакета
-      test_is_ok = true;
-    } else {
-      test_is_ok = false;
-      Serial.print(F("failed, code: "));
-      Serial.println(state);
-      Serial.print(F("test_is_ok = "));
-      Serial.println(test_is_ok);
-      while (true);
-    }
+    // if (state == RADIOLIB_ERR_NONE) {
+    //   Serial.println(F("success!"));
+    //   digitalWrite(LED_PIN, LOW);     //Включаем светодиод, сигнализация об передаче/приёма пакета
+    //   test_is_ok = true;
+    // } else {
+    //   test_is_ok = false;
+    //   Serial.print(F("failed, code: "));
+    //   Serial.println(state);
+    //   Serial.print(F("test_is_ok = "));
+    //   Serial.println(test_is_ok);
+    //   while (true);
+    // }
   #endif
 
 
@@ -743,13 +747,13 @@ void loop() {
 
 
   #ifdef RECEIVER   //Если определен модуль как приёмник
-    //проверяем, была ли предыдущая передача успешной
-    Serial.println("..................................................");
-    if(operationDone) {
-      //Сбрасываем сработавший флаг прерывания
-      operationDone = false;
-      receive_and_print_data();
-    }
+    // //проверяем, была ли предыдущая передача успешной
+    // Serial.println("..................................................");
+    // if(operationDone) {
+    //   //Сбрасываем сработавший флаг прерывания
+    //   operationDone = false;
+    //   receive_and_print_data();
+    // }
   #endif
 
 
@@ -825,11 +829,11 @@ void loop() {
   #endif
 
   #ifdef TEST
-    if(test_is_ok)
-    {
-      delay(1000);
-      digitalWrite(LED_PIN, LOW); //Выключаем светодиод, сигнализация об окончании передачи/приёма пакета
-    }
+    // if(test_is_ok)
+    // {
+    //   delay(1000);
+    //   digitalWrite(LED_PIN, LOW); //Выключаем светодиод, сигнализация об окончании передачи/приёма пакета
+    // }
   #endif
 
 
