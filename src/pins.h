@@ -2,6 +2,7 @@
 #define _____PINS_____
 
 #include <Arduino.h>
+#include <samples/LORA_TRANSMIT_RECEIVE/precompiler_flags.h>
 
 #define UNDEF_PIN (uint32_t)1001
 
@@ -18,6 +19,8 @@ const uint32_t NSS_PIN_2 = 13;
 const uint32_t IRQ_PIN_2 = 34;
 const uint32_t NRST_PIN_2 = 17;
 const uint32_t BUSY_PIN_2 = 33;
+
+
 
 
 #endif
