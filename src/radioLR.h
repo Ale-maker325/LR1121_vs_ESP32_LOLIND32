@@ -6,6 +6,7 @@
 #include <RadioLib.h>
 #include <pins.h>
 #include <stdint.h>
+#include <settings.h>
 
 
 
@@ -51,80 +52,6 @@ LORA_CONFIGURATION config_radio2;
 
 
 
-/**
-* @brief Функция установки настроек передатчика
-* 
-* @param radio - экземпляр класса передатчика
-* @param config - экземпляр структуры для настройки модуля
-*/
-void radio_setSettings(LR1121 radio, LORA_CONFIGURATION config_radio, String radio_name)
-{
-  Serial.print(F("Set LoRa settings of radio "));
-  Serial.println(radio_name);
-
-
-  // Устанавливаем необходимую нам частоту работы трансивера
-  if (radio.setFrequency(config_radio.frequency) == RADIOLIB_ERR_INVALID_FREQUENCY) {
-    Serial.println(F("Selected frequency is invalid for this module!"));
-    while (true);
-  }
-  Serial.print(F("Set frequency = "));
-  Serial.println(config_radio.frequency);
-
-
-  // установить полосу пропускания до 250 кГц
-  if (radio.setBandwidth(config_radio.bandwidth) == RADIOLIB_ERR_INVALID_BANDWIDTH) {
-    Serial.println(F("Selected bandwidth is invalid for this module!"));
-    while (true);
-  }
-  Serial.print(F("Set bandWidth = "));
-  Serial.println(config_radio.bandwidth);
-
-  // коэффициент расширения 
-  if (radio.setSpreadingFactor(config_radio.spreadingFactor) == RADIOLIB_ERR_INVALID_SPREADING_FACTOR) {
-    Serial.println(F("Selected spreading factor is invalid for this module!"));
-    while (true);
-  }
-  Serial.print(F("Set spreadingFactor = "));
-  Serial.println(config_radio.spreadingFactor);
-
-  // установить скорость кодирования
-  if (radio.setCodingRate(config_radio.codingRate) == RADIOLIB_ERR_INVALID_CODING_RATE) {
-    Serial.println(F("Selected coding rate is invalid for this module!"));
-    while (true);
-  }
-  Serial.print(F("Set codingRate = "));
-  Serial.println(config_radio.codingRate);
-
-  // Устанавливаем слово синхронизации
-  if (radio.setSyncWord(config_radio.syncWord) != RADIOLIB_ERR_NONE) {
-    Serial.println(F("Unable to set sync word!"));
-    while (true);
-  }
-  Serial.print(F("Set syncWord = "));
-  Serial.println(config_radio.syncWord);
-
-  // Устанавливаем выходную мощность трансивера
-  if (radio.setOutputPower(config_radio.outputPower) == RADIOLIB_ERR_INVALID_OUTPUT_POWER) {
-    Serial.println(F("Selected output power is invalid for this module!"));
-    while (true);
-  }
-  Serial.print(F("Set setOutputPower = "));
-  Serial.println(config_radio.outputPower); 
-
-  // установить длину преамбулы (допустимый диапазон 6 - 65535)
-  if (radio.setPreambleLength(config_radio.preambleLength) == RADIOLIB_ERR_INVALID_PREAMBLE_LENGTH) {
-    Serial.println(F("Selected preamble length is invalid for this module!"));
-    while (true);
-  }
-  Serial.print(F("Set preambleLength = "));
-  Serial.println(config_radio.preambleLength);
-
-  
-
-  Serial.println(F("All settings successfully changed!"));
-}
-
 
 
 
@@ -153,6 +80,143 @@ IRAM_ATTR void setFlag_2(void) {
   operationDone_2 = true;
 }
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // установите конфигурацию радиочастотного переключателя для Wio WM1110
+// // Wio WM1110 использует DIO5 и DIO6 для радиочастотного переключения.
+// // ПРИМЕЧАНИЕ: другие платы могут отличаться!
+// static const uint32_t rfswitch_dio_pins[] = { 
+//   RADIOLIB_LR11X0_DIO7, RADIOLIB_LR11X0_DIO8,
+//   RADIOLIB_NC, RADIOLIB_NC, RADIOLIB_NC
+// };
+
+
+
+// static const Module::RfSwitchMode_t rfswitch_table[] = {
+//   // mode                  DIO7  DIO8 
+//   { LR11x0::MODE_STBY,   { LOW,  LOW  } },
+//   { LR11x0::MODE_RX,     { HIGH, LOW  } },
+//   { LR11x0::MODE_TX,     { HIGH, HIGH } },
+//   { LR11x0::MODE_TX_HP,  { LOW,  HIGH } },
+//   { LR11x0::MODE_TX_HF,  { LOW,  LOW  } },
+//   { LR11x0::MODE_GNSS,   { LOW,  LOW  } },
+//   { LR11x0::MODE_WIFI,   { LOW,  LOW  } },
+//   END_OF_MODE_TABLE,
+// };
+
+
+
+
+// set RF switch configuration for Wio WM1110
+// Wio WM1110 uses DIO5 and DIO6 for RF switching
+// NOTE: other boards may be different!
+static const uint32_t rfswitch_dio_pins[] = { 
+  RADIOLIB_LR11X0_DIO5, RADIOLIB_LR11X0_DIO6,
+  RADIOLIB_LR11X0_DIO7, RADIOLIB_LR11X0_DIO8, RADIOLIB_NC
+};
+
+
+// static const uint32_t rfswitch_dio_pins[] = { 
+//   RADIOLIB_LR11X0_DIO7, RADIOLIB_LR11X0_DIO8, RADIOLIB_NC, RADIOLIB_NC,
+//    RADIOLIB_NC
+// };
+
+
+static const Module::RfSwitchMode_t rfswitch_table[] = {
+  // mode                  DIO5  DIO6 
+  { LR11x0::MODE_STBY,   { LOW,  LOW, HIGH, LOW } },
+  { LR11x0::MODE_RX,     { LOW, HIGH, HIGH, HIGH  } },
+  { LR11x0::MODE_TX,     { HIGH, LOW, LOW, LOW } },
+  { LR11x0::MODE_TX_HP,  { HIGH, LOW, HIGH, LOW } },
+  { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
+  { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
+  { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
+  END_OF_MODE_TABLE,
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+typedef uint8_t Radio_Number;
+enum
+{
+    Radio_NONE = 0b00000000,     // Bit mask for no radio
+    Radio_1    = 0b00000001,     // Bit mask for radio 1
+    Radio_2    = 0b00000010,     // Bit mask for radio 2
+    Radio_All  = 0b00000011      // bit mask for both radios
+};
+
+
+
+
+
+bool ICACHE_RAM_ATTR WaitOnBusy(Radio_Number radioNumber)
+{
+    constexpr uint32_t wtimeoutUS = 1000U;
+    uint32_t startTime = 0;
+
+    while (true)
+    {
+        if (radioNumber == Radio_1)
+        {
+            if (digitalRead(BUSY_PIN_1) == LOW) return true;
+        }
+        else if (radioNumber == Radio_2)
+        {
+            if (BUSY_PIN_2 == UNDEF_PIN || digitalRead(BUSY_PIN_2) == LOW) return true;
+        }
+        else if (radioNumber == Radio_All)
+        {
+            if (BUSY_PIN_2 != UNDEF_PIN)
+            {
+                if (digitalRead(BUSY_PIN_1) == LOW && digitalRead(BUSY_PIN_2) == LOW) return true;
+            }
+            else
+            {
+                if (digitalRead(BUSY_PIN_1) == LOW) return true;
+            }
+        }
+        // Use this time to call micros().
+        uint32_t now = micros();
+        if (startTime == 0) startTime = now;
+        if ((now - startTime) > wtimeoutUS) return false;
+    }
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

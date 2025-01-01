@@ -26,7 +26,7 @@ void displayInit()
 
   //Инициализируем дисплей
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {// SSD1306_SWITCHCAPVCC = напряжение дисплея от 3.3V
-    Serial.println(F("SSD1306 allocation failed"));
+    Serial.println(F("SSD1306 ERROR INIT"));
     for(;;); // Don't proceed, loop forever
   }
 
@@ -41,10 +41,34 @@ void displayInit()
   display.setTextSize(1);                 // Normal 1:1 pixel scale
   display.setTextColor(SSD1306_WHITE);    // Draw white text
   display.cp437(true);                    // Use full 256 char 'Code Page 437' font
+
+  display.setCursor(20, 5);
+  display.print(F("DISPLAY INIT"));
+  display.display();
+  delay(2000);
+  display.clearDisplay();
+  
 }
 
 
 
+
+/**
+ * @brief Функция для вывода на экран дисплея состояния
+ * работы текущего радио
+ * 
+ * @param x - координата экрана по Х
+ * @param y - координата экрана по У
+ * @param RadioName - наименование радио
+ * @param state - текущее состояние в виде строки STRING
+ */
+void displayPrintState(int16_t x, int16_t y, String &RadioName, String state)
+{
+  String str = RadioName + " : " + state;
+  display.setCursor(x, y);
+  display.print(str);
+  display.display();
+}
 
 
 
