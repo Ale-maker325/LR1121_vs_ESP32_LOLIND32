@@ -599,11 +599,7 @@ void radio_setSettings(LR1121 radio, LORA_CONFIGURATION config_radio, String rad
 void setup() {
   //Инициализируем сериал-монитор со скоростью 115200
   Serial.begin(115200);
-  Serial.println();
-  Serial.println();
-  Serial.print(I2C_SDA_PIN);
-  Serial.println();
-  Serial.println();
+
   Serial.printf("Chip Model %s, ChipRevision %d, Cpu Freq %d, SDK Version %s\n", ESP.getChipModel(), ESP.getChipRevision(), ESP.getCpuFreqMHz(), ESP.getSdkVersion());
     
   //инициализируем дисплей
