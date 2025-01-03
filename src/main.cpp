@@ -587,6 +587,50 @@ void radio_setSettings(LR1121 radio, LORA_CONFIGURATION config_radio, String rad
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // #include "esp_clk.h"
 
 // void displaySlowClockCalibration() { uint32_t slow_clk_cal = esp_clk_slowclk_cal_get(); Serial.print("Slow Clock Calibration Value: "); Serial.print(slow_clk_cal); Serial.println(" microseconds"); }
@@ -599,7 +643,7 @@ void radio_setSettings(LR1121 radio, LORA_CONFIGURATION config_radio, String rad
 void setup() {
   //Инициализируем сериал-монитор со скоростью 115200
   Serial.begin(115200);
-
+  SPI_MODEM.begin(SCK_RADIO, MISO_RADIO, MOSI_RADIO);
   Serial.printf("Chip Model %s, ChipRevision %d, Cpu Freq %d, SDK Version %s\n", ESP.getChipModel(), ESP.getChipRevision(), ESP.getCpuFreqMHz(), ESP.getSdkVersion());
     
   //инициализируем дисплей

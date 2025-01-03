@@ -52,16 +52,16 @@
   #define BUSY_PIN_2 -1
 #endif
 
-#ifndef xx
-  #define xx -1
+#ifndef MOSI_RADIO
+  #define MOSI_RADIO 23
 #endif
 
-#ifndef xx
-  #define xx -1
+#ifndef MISO_RADIO
+  #define MISO_RADIO 19
 #endif
 
-#ifndef xx
-  #define xx -1
+#ifndef SCK_RADIO
+  #define SCK_RADIO 18
 #endif
 
 #ifndef xx

@@ -3,6 +3,7 @@
 
 
 #include <Arduino.h>
+#include <SPI.h>
 #include <RadioLib.h>
 #include <pins.h>
 #include <stdint.h>
@@ -13,9 +14,12 @@
 int state_1 = RADIOLIB_ERR_NONE; // Переменная, хранящая код состояния передачи/приёма
 int state_2 = RADIOLIB_ERR_NONE; // Переменная, хранящая код состояния передачи/приёма
 
-LR1121 radio1 = new Module(NSS_PIN_1, IRQ_PIN_1, NRST_PIN_1, BUSY_PIN_1); //Инициализируем экземпляр радио
+SPIClass SPI_MODEM;
+
+
+LR1121 radio1 = new Module(NSS_PIN_1, IRQ_PIN_1, NRST_PIN_1, BUSY_PIN_1, SPI_MODEM); //Инициализируем экземпляр радио
 #ifdef RADIO_2
-LR1121 radio2 = new Module(NSS_PIN_2, IRQ_PIN_2, NRST_PIN_2, BUSY_PIN_2); //Инициализируем экземпляр радио
+LR1121 radio2 = new Module(NSS_PIN_2, IRQ_PIN_2, NRST_PIN_2, BUSY_PIN_2, SPI_MODEM); //Инициализируем экземпляр радио
 #endif
 
 
