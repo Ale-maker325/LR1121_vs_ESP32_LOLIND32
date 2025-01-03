@@ -5,7 +5,6 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <RadioLib.h>
-// #include <pins.h>
 #include <stdint.h>
 #include <settings.h>
 
@@ -248,10 +247,96 @@ bool ICACHE_RAM_ATTR WaitOnBusy(Radio_Number radioNumber)
 
 
 
+void detected_CAD(Radio_Number radioNumber)
+{
+  int state;
+  if (radioNumber == Radio_1)
+  {
+    state = radio1.getChannelScanResult();
+
+    if (state == RADIOLIB_LORA_DETECTED) {
+      // LoRa packet was detected
+      #ifdef DEBUG_PRINT
+      Serial.println(F("[LR1110] RX_1 packet detected!"));
+      #endif
+    } else {
+      // some other error occurred
+      #ifdef DEBUG_PRINT
+      Serial.print(F("[LR1110] RX_1 packet detected Failed, code "));
+      Serial.println(state);
+      #endif
+
+    }
+  }
+  if (radioNumber == Radio_2)
+  {
+    state = radio2.getChannelScanResult();
+
+    if (state == RADIOLIB_LORA_DETECTED) {
+      // LoRa packet was detected
+      #ifdef DEBUG_PRINT
+      Serial.println(F("[LR1110] RX_2 packet detected!"));
+      #endif
+    } else {
+      // some other error occurred
+      #ifdef DEBUG_PRINT
+      Serial.print(F("[LR1110] RX_2 packet detected Failed, code "));
+      Serial.println(state);
+      #endif
+
+    }
+  }
+}
 
 
 
 
+
+
+void detectedPreamble(Radio_Number radioNumber)
+{
+  int state;
+  if (radioNumber == Radio_1)
+  {
+    // start scanning current channel
+    state = radio1.scanChannel();
+
+    if (state == RADIOLIB_LORA_DETECTED) {
+      // LoRa preamble was detected
+      #ifdef DEBUG_PRINT
+      Serial.println(F("Preamble detected!"));
+      #endif
+
+    } else {
+      // some other error occurred
+      #ifdef DEBUG_PRINT
+      Serial.print(F("Preamble detected failed, code "));
+      Serial.println(state);
+      #endif
+
+    }
+  }
+  if (radioNumber == Radio_2)
+  {
+    // start scanning current channel
+    state = radio2.scanChannel();
+
+    if (state == RADIOLIB_LORA_DETECTED) {
+      // LoRa preamble was detected
+      #ifdef DEBUG_PRINT
+      Serial.println(F("Preamble detected!"));
+      #endif
+
+    } else {
+      // some other error occurred
+      #ifdef DEBUG_PRINT
+      Serial.print(F("Preamble detected failed, code "));
+      Serial.println(state);
+      #endif
+
+    }
+  }
+}
 
 
 

@@ -57,107 +57,6 @@ String SPACE = F(" ");
 
 
 
-/**
-* @brief Функция получает данные, выводит на экран информацию о полученном,
-* выводит информацию о получении в сериал-порт
-* 
-*/
-//String str;
-void receive_and_print_data()
-{ 
-  String str = " ";
-  //можно прочитать полученные данные как строку
-  state_1 = radio1.readData(str);
-
-  //Если пакет данных был получен успешно, распечатываем данные
-  //в сериал - монитор и на экран
-  if (state_1 == RADIOLIB_ERR_NONE) {
-
-    display.setCursor(0, 0); 
-    display.print(RECEIVE);
-    display.print(str);
-                  
-    Serial.println(F("Received packet!"));
-
-    // print data of the packet
-    Serial.print(F("Data:\t\t"));
-    Serial.println(str);
-
-    // print RSSI (Received Signal Strength Indicator)
-    float rssi_data = radio1.getRSSI();
-    String RSSI_DATA = (String)rssi_data;
-          
-    Serial.print(F("\t\t\t"));
-    Serial.print(RSSI);
-    Serial.print(RSSI_DATA);
-    Serial.println(dBm);
-          
-    display.setCursor(0, 16);
-    display.print(RSSI);
-    display.print(RSSI_DATA);
-    display.print(dBm);
-              
-
-    // print SNR (Signal-to-Noise Ratio)
-    float snr_data = radio1.getSNR();
-    String SNR_DATA = (String)snr_data;
-
-    Serial.print(F("\t\t\t"));
-    Serial.print(SNR);
-    Serial.print(SNR_DATA);
-    Serial.println(dB);
-
-    display.setCursor(0, 27);
-    display.print(SNR);
-    display.print(SNR_DATA);
-    display.print(dB);
-
-    // print frequency error
-    float freq_error = radio1.getFrequencyError();
-    String FREQ_ERROR = (String) freq_error;
-
-    Serial.print(F("\t\t\t"));
-    Serial.print(FR_ERR);
-    Serial.print(FREQ_ERROR);
-    Serial.println(HZ);
-
-    display.setCursor(0, 38);
-    display.print(FR_ERR);
-    display.print(FREQ_ERROR);
-    display.print(HZ);
-
-    display.display();
-    display.clearDisplay();
-
-    digitalWrite(LED_PIN, LOW);     //Включаем светодиод, сигнализация об передаче/приёма пакета
-
-    } else if (state_1 == RADIOLIB_ERR_CRC_MISMATCH) {
-      // packet was received, but is malformed
-      Serial.println(F("CRC ERROR!"));
-      display.clearDisplay();
-      display.setCursor(0, 10);
-      display.print(F("CRC ERROR!"));
-      display.display();
-
-    } else {
-      // some other error occurred
-      Serial.print(F("Failed, code "));
-      Serial.println(state_1);
-      display.clearDisplay();
-      display.setCursor(0, 10);
-      display.print(F("ERROR: "));
-      display.print(state_1);
-      display.display();
-    }
-}
-  
-
-
-
-
-
-
-
 
 
 
@@ -482,26 +381,61 @@ void setup() {
   
   #ifdef RECEIVER   //Если определена работа модуля как приёмника
 
-    // //Устанавливаем функцию, которая будет вызываться при получении пакета данных
-    // radio1.setPacketReceivedAction(setFlag);
+    //Устанавливаем функцию, которая будет вызываться при получении пакета данных
+    radio1.setPacketReceivedAction(setFlag_1);
+    #ifdef RADIO_2
+    radio1.setPacketReceivedAction(setFlag_2);
+    #endif
 
-    // //Начинаем слушать есть ли пакеты
-    // Serial.print(F("[SX1278] Starting to listen ... "));
-    // state = radio1.startReceive();
-  
-    // if (state == RADIOLIB_ERR_NONE) {
-    //   Serial.println(F("success!"));
-    //   digitalWrite(LED_PIN, LOW);     //Включаем светодиод, сигнализация об передаче/приёма пакета
-    // } else {
-    //   Serial.print(F("failed, code: "));
-    //   Serial.println(state);
-    //   while (true);
-    // }
+    #ifdef DEBUG_PRINT
+    //Начинаем слушать есть ли пакеты
+    Serial.print(TABLE_LEFT);
+    Serial.print(F("[SX1278] Starting to listen RX_1 "));
+    Serial.println(TABLE_RIGHT);
+    #endif
 
-    // //получаем данные
-    // receive_and_print_data();
+    state_1 = radio1.startReceive();
+    if (state_1 == RADIOLIB_ERR_NONE) {
+      #ifdef DEBUG_PRINT
+      Serial.println(F("success!"));
+      Serial.println(SPACE);
+      #endif
+      digitalWrite(LED_PIN, LOW);     //Включаем светодиод, сигнализация об передаче/приёма пакета
+    } else {
+      #ifdef DEBUG_PRINT
+      Serial.print(F("failed, code: "));
+      Serial.println(state_1);
+      #endif
+      while (true);
+    }
 
-       
+    #ifdef RADIO_2
+    #ifdef DEBUG_PRINT
+    //Начинаем слушать есть ли пакеты
+    Serial.print(TABLE_LEFT);
+    Serial.print(F("[SX1278] Starting to listen RX_2 "));
+    Serial.println(TABLE_RIGHT);
+    #endif
+
+    state_2 = radio2.startReceive();
+    if (state_2 == RADIOLIB_ERR_NONE) {
+      #ifdef DEBUG_PRINT
+      Serial.println(F("success!"));
+      Serial.println(SPACE);
+      #endif
+      digitalWrite(LED_PIN, LOW);     //Включаем светодиод, сигнализация об передаче/приёма пакета
+    } else {
+      #ifdef DEBUG_PRINT
+      Serial.print(F("failed, code: "));
+      Serial.println(state_2);
+      #endif
+      while (true);
+    }
+    #endif
+
+    String str;
+    receive_and_print_data(str);
+
   #endif
 
 
@@ -572,13 +506,47 @@ void loop() {
 
 
   #ifdef RECEIVER   //Если определен модуль как приёмник
-    // //проверяем, была ли предыдущая передача успешной
-    // Serial.println("..................................................");
-    // if(operationDone) {
-    //   //Сбрасываем сработавший флаг прерывания
-    //   operationDone = false;
-    //   receive_and_print_data();
-    // }
+    //проверяем, была ли предыдущая передача успешной
+    #ifdef DEBUG_PRINT
+    Serial.println("..................................................");
+    #endif
+    if(operationDone_2) {
+      
+      //Сбрасываем сработавший флаг прерывания
+      operationDone_2 = false;
+
+      //готовим строку для отправки
+      String str = "#" + String(count++);
+
+      receive_and_print_data(str);
+      
+      
+    }
+
+    // check CAD result
+    detected_CAD(Radio_1);
+    detectedPreamble(Radio_1);
+    
+
+    #ifdef RADIO_2
+    if(operationDone_2) {
+      
+      //Сбрасываем сработавший флаг прерывания
+      operationDone_2 = false;
+
+      //готовим строку для отправки
+      String str = "#" + String(count++);
+
+      receive_and_print_data(str);
+
+      // check CAD result
+      detected_CAD(Radio_2);
+      detectedPreamble(Radio_2);
+
+      
+      
+    }
+    #endif
   #endif
 
 

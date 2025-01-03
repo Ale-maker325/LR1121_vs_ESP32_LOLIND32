@@ -138,7 +138,7 @@ void displayPrintState(int16_t x, int16_t y, String &RadioName, String state)
  * @param transmit_str  - строка для передачи
  * @param radioNumber   - номер передатчика (так как их может быть два)
  */
-void printStateResult(int &state, String &transmit_str, Radio_Number radioNumber)
+void printStateResultTX(int &state, String &transmit_str, Radio_Number radioNumber)
 {
   String RADIO_NAME;
   int x, y;
@@ -204,6 +204,79 @@ void printStateResult(int &state, String &transmit_str, Radio_Number radioNumber
 
 
 
+
+
+/**
+ * @brief Функция, которая обеспечивает вывод текущего состояния 
+ * приёмопередатчика в сериал-порт (если он задан) и на дисплей
+ * 
+ * @param state         - текущее состояние, полученное от передатчика при его работе
+ * @param read_str  - строка для передачи
+ * @param radioNumber   - номер передатчика (так как их может быть два)
+ */
+void printStateResult_RX(int &state, String &read_str, Radio_Number radioNumber)
+{
+  String RADIO_NAME;
+  int x, y;
+  switch (radioNumber)
+  {
+  case Radio_1: 
+    RADIO_NAME = RADIO_1_NAME;
+    x = 5;
+    y = 5;
+    break;
+  case Radio_2: 
+    RADIO_NAME = RADIO_2_NAME;
+    x = 5;
+    y = 20;
+    break;
+  
+  default: 
+    RADIO_NAME = "RADIO_NONAME!!!";
+    x = 5;
+    y = 5;
+    break;
+  }
+
+  //Если приём успешен, выводим сообщение в сериал-монитор
+  if (state == RADIOLIB_ERR_NONE) {
+    //Выводим сообщение об успешном приёме
+    #ifdef DEBUG_PRINT
+    print_to_terminal_radio_state(RADIO_NAME, F("RECEIVE PACKET"));
+    #endif
+    displayPrintState(x, y, RADIO_NAME, read_str);
+
+    #ifdef DEBUG_PRINT              
+    //Выводим в сериал данные отправленного пакета
+    Serial.print(F("Data:\t\t"));
+    Serial.println(read_str);
+    #endif
+
+    digitalWrite(LED_PIN, LOW);     //Включаем светодиод, сигнализация об передаче/приёма пакета
+
+    
+          
+  } else {
+    //Если были проблемы при передаче, сообщаем об этом
+    
+    String str = (String)state_1;
+    #ifdef DEBUG_PRINT
+    Serial.print(F("receive failed, "));
+    
+    print_to_terminal_radio_state(RADIO_NAME, str);
+    #endif
+
+    displayPrintState(x, y, RADIO_NAME, str);
+  
+  }
+  
+}
+
+
+
+
+
+
 /**
 * @brief Функция отправляет данные, выводит на экран информацию об отправке,
 * выводит информацию об отправке в сериал-порт
@@ -219,7 +292,7 @@ void transmit_and_print_data(String &transmit_str)
   //Ждём завершения передачи
   WaitOnBusy(Radio_1);
   //Печатаем данные куда надо (в сериал, если он активирован, и на дисплей)
-  printStateResult(state_1, transmit_str, Radio_1);
+  printStateResultTX(state_1, transmit_str, Radio_1);
   //Оканчиваем передачу первым передатчиком
   state_1 = radio1.finishTransmit();
   //state_1 = radio1.startReceive();
@@ -230,7 +303,7 @@ void transmit_and_print_data(String &transmit_str)
   //Ждём завершения передачи
   WaitOnBusy(Radio_2);
   //Печатаем данные куда надо (в сериал, если он активирован, и на дисплей)
-  printStateResult(state_2, transmit_str, Radio_2);
+  printStateResultTX(state_2, transmit_str, Radio_2);
   WaitOnBusy(Radio_2);
   //Оканчиваем передачу первым передатчиком
   state_2 = radio2.finishTransmit();
@@ -238,6 +311,62 @@ void transmit_and_print_data(String &transmit_str)
 
   #endif  
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+* @brief Функция отправляет данные, выводит на экран информацию об отправке,
+* выводит информацию об отправке в сериал-порт
+* 
+* @param transmit_str - строка для передачи
+*/
+void receive_and_print_data(String &receive_str)
+{
+  display.clearDisplay();
+  state_1 = radio1.readData(receive_str);
+  //Ждём завершения передачи
+  WaitOnBusy(Radio_1);
+  //Печатаем данные куда надо (в сериал, если он активирован, и на дисплей)
+  printStateResult_RX(state_1, receive_str, Radio_1);
+  
+
+  #ifdef RADIO_2
+  //Посылаем пакет
+  state_2 = radio2.readData(receive_str);
+  //Ждём завершения передачи
+  WaitOnBusy(Radio_2);
+  //Печатаем данные куда надо (в сериал, если он активирован, и на дисплей)
+  printStateResult_RX(state_2, receive_str, Radio_2);
+  WaitOnBusy(Radio_2);
+  
+
+  #endif  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
