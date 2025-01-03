@@ -5,7 +5,7 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <RadioLib.h>
-#include <pins.h>
+// #include <pins.h>
 #include <stdint.h>
 #include <settings.h>
 
@@ -54,7 +54,37 @@ LORA_CONFIGURATION config_radio1;
 LORA_CONFIGURATION config_radio2;
 
 
+/**
+ * @brief Настройка радио передатчика в соответствии с директивами,
+ * которые заданы в файле "settings.h"
+ * 
+ */
+void setRadioMode()
+{
+  //Задаём параметры конфигурации радиотрансивера 1
+  config_radio1.frequency = RADIO_1_FREQ;
+  config_radio1.bandwidth = RADIO_1_BANDWIDTH;
+  config_radio1.spreadingFactor = RADIO_1_SPREAD_FACTOR;
+  config_radio1.codingRate = RADIO_1_CODING_RATE;
+  config_radio1.syncWord = RADIO_1_SYNC_WORD;
+  config_radio1.outputPower = RADIO_1_OUTPUT_POWER;
+  config_radio1.currentLimit = RADIO_1_CURRENT_LIMIT;
+  config_radio1.preambleLength = RADIO_1_PREAMBLE_LENGTH;
+  config_radio1.gain = RADIO_1_GAIN;
 
+  #ifdef RADIO_2
+  //Задаём параметры конфигурации радиотрансивера 2
+  config_radio2.frequency = RADIO_2_FREQ;
+  config_radio2.bandwidth = RADIO_2_BANDWIDTH;
+  config_radio2.spreadingFactor = RADIO_2_SPREAD_FACTOR;
+  config_radio2.codingRate = RADIO_2_CODING_RATE;
+  config_radio2.syncWord = RADIO_2_SYNC_WORD;
+  config_radio2.outputPower = RADIO_2_OUTPUT_POWER;
+  config_radio2.currentLimit = RADIO_2_CURRENT_LIMIT;
+  config_radio2.preambleLength = RADIO_2_PREAMBLE_LENGTH;
+  config_radio2.gain = RADIO_2_GAIN;
+  #endif
+}
 
 
 

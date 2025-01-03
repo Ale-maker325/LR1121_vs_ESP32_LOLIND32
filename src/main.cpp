@@ -6,7 +6,8 @@
  * и рассчитан для применения с дисплеем OLED SSD1306.
  * 
  * Для работы передатчика нужно также определиться, будет он работать как передатчик, либо как приёмник. Для этого необходимо
- * раскомментировать один из дефайнов: #define RECEIVER или #define TRANSMITTER, а второй закомментировать.
+ * раскомментировать один из дефайнов: #define RECEIVER или #define TRANSMITTER в файле settings.h, который соотчетствует выбранному
+ * инвайрменту.
  *  
  */
 
@@ -14,16 +15,15 @@
 #include <SPI.h>
 #include <Wire.h>
 #include <display.h>
-#include <pins.h>
 #include <radioLR.h>
 #include <settings.h>
 #include <RadioLib.h>
 
 
-byte test_is_ok = false;              //Переменная, хранящая успешность теста при старте передатчика. Значение либо true, либо false
+
+byte    test_is_ok = false;   //Переменная, хранящая успешность теста при старте передатчика. Значение либо true, либо false
 boolean FUN_IS_ON = false;    //Логический флаг включения/отключения вентилятора охлаждения
-//Счётчик для сохранения количества отправленных/полученных пакетов
-uint64_t count = 0;
+uint64_t count = 0;           //Счётчик для сохранения количества отправленных/полученных пакетов
 
 
 
@@ -41,160 +41,11 @@ String HZ = F(")Hz");         //Строка для печати SNR
 String DT_RATE = F("RATE(");  //Строка для печати скорости передачи данных
 String BS = F(")B/s");        //Строка для печати скорости передачи данных
 
-String TRANSMIT_1 = F("TRANSMIT_1: ");  //Строка сообщения для передачи
-String TRANSMIT_2 = F("TRANSMIT_2: ");  //Строка сообщения для передачи
-
 String RECEIVE = F("RECEIVE: ");  //Строка сообщения для приёма
 
 String TABLE_RIGHT = F("     ***************************");
 String TABLE_LEFT  = F("***************************     ");
 String SPACE = F(" ");
-String RADIO_1_NAME = F("RADIO_1");
-String RADIO_2_NAME = F("RADIO_2");
-
-
-
-
-
-
-
-/**
- * @brief Функция, выводит в сериал монитор сообщения
- * 
- * @param RadioName - имя радио
- * @param state     - текущее состояние радио - это просто информационная сторока
- */
-void print_to_terminal_radio_state(String &RadioName, String state)
-{
-  String str = RadioName + " : " + state;
-  Serial.println(str);
-}
-
-
-
-
-void (*print_to_terminal)(String &RadioName, String state) = print_to_terminal_radio_state;
-// void print_to_terminal_radio_state(String &RadioName, String state)  __attribute__ ((weak));
-// int recv_callback()  {return 0;}
-
-
-
-
-
-
-/**
- * @brief Функция, которая обеспечивает вывод текущего состояния 
- * приёмопередатчика в сериал-порт (если он задан) и на дисплей
- * 
- * @param state         - текущее состояние, полученное от передатчика при его работе
- * @param transmit_str  - строка для передачи
- * @param radioNumber   - номер передатчика (так как их может быть два)
- */
-void printStateResult(int &state, String &transmit_str, Radio_Number radioNumber)
-{
-  String RADIO_NAME;
-  int x, y;
-  switch (radioNumber)
-  {
-  case Radio_1: 
-    RADIO_NAME = RADIO_1_NAME;
-    x = 5;
-    y = 5;
-    break;
-  case Radio_2: 
-    RADIO_NAME = RADIO_2_NAME;
-    x = 5;
-    y = 20;
-    break;
-  
-  default: 
-    RADIO_NAME = "RADIO_NONAME!!!";
-    x = 5;
-    y = 5;
-    break;
-  }
-
-  //Если передача успешна, выводим сообщение в сериал-монитор
-  if (state == RADIOLIB_ERR_NONE) {
-    //Выводим сообщение об успешной передаче
-    print_to_terminal_radio_state(RADIO_NAME, F("SEND PACKET"));
-    print_to_terminal_radio_state(RADIO_NAME, F("TRANSMITT SUCCES!"));
-    displayPrintState(x, y, RADIO_NAME, transmit_str);
-                  
-    //Выводим в сериал данные отправленного пакета
-    Serial.print(F("Data:\t\t"));
-    Serial.println(transmit_str);
-
-    digitalWrite(LED_PIN, LOW);     //Включаем светодиод, сигнализация об передаче/приёма пакета
-
-    
-          
-  } else {
-    //Если были проблемы при передаче, сообщаем об этом
-    String str = (String)state_1;
-    Serial.print(F("transmission failed, "));
-    print_to_terminal_radio_state(RADIO_NAME, str);
-
-    displayPrintState(x, y, RADIO_NAME, str);
-  
-  }
-  
-}
-
-
-
-
-
-
-
-/**
-* @brief Функция отправляет данные, выводит на экран информацию об отправке,
-* выводит информацию об отправке в сериал-порт
-* 
-* @param transmit_str - строка для передачи
-*/
-void transmit_and_print_data(String &transmit_str)
-{
-  display.clearDisplay();
-
-  //Посылаем пакет
-  state_1 = radio1.startTransmit(transmit_str);
-  //Ждём завершения передачи
-  WaitOnBusy(Radio_1);
-  //Печатаем данные куда надо (в сериал, если он активирован, и на дисплей)
-  printStateResult(state_1, transmit_str, Radio_1);
-  //Оканчиваем передачу первым передатчиком
-  state_1 = radio1.finishTransmit();
-  //state_1 = radio1.startReceive();
-
-  #ifdef RADIO_2
-  //Посылаем пакет
-  state_2 = radio2.startTransmit(transmit_str);
-  //Ждём завершения передачи
-  WaitOnBusy(Radio_2);
-  //Печатаем данные куда надо (в сериал, если он активирован, и на дисплей)
-  printStateResult(state_2, transmit_str, Radio_2);
-  WaitOnBusy(Radio_2);
-  //Оканчиваем передачу первым передатчиком
-  state_2 = radio2.finishTransmit();
-  //state_2 = radio2.startReceive();
-
-  #endif  
-}
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -308,78 +159,6 @@ void receive_and_print_data()
 
 
 
-/**
- * @brief Функция, выводящая значение прошивки радио модуля
- * 
- */
-void printVersions() {
-  LR11x0VersionInfo_t version1;
-  LR11x0VersionInfo_t version2;
-
-  Serial.println(F("****************** [LR1110] Reading firmware versions ******************** "));
-
-  int16_t state1 = radio1.getVersionInfo(&version1);
-  #ifdef RADIO_2
-  int16_t state2 = radio2.getVersionInfo(&version2);
-  #endif
-
-  if (state1 == RADIOLIB_ERR_NONE) {
-    Serial.println(F("success!"));
-    Serial.print(F("[LR1110] Device1: "));
-    Serial.println(version1.device);
-
-    Serial.print(F("[LR1110] Base firmware1: "));
-    Serial.print(version1.fwMajor);
-    Serial.print('.');
-    Serial.println(version1.fwMinor);
-
-    Serial.print(F("[LR1110] WiFi firmware1: "));
-    Serial.print(version1.fwMajorWiFi);
-    Serial.print('.');
-    Serial.println(version1.fwMinorWiFi);
-
-    Serial.print(F("[LR1110] GNSS firmware1: "));
-    Serial.print(version1.fwGNSS);
-    Serial.print('.');
-    Serial.println(version1.almanacGNSS);
-
-  } else {
-    Serial.print(F("failed_radio №1:, code "));
-    Serial.println(state1);
-    while (true) { delay(10); }
-  }
-
-  #ifdef RADIO_2
-    if (state2 == RADIOLIB_ERR_NONE) {
-    Serial.println(F("success!"));
-    Serial.print(F("[LR1110] Device1: "));
-    Serial.println(version2.device);
-
-    Serial.print(F("[LR1110] Base firmware1: "));
-    Serial.print(version2.fwMajor);
-    Serial.print('.');
-    Serial.println(version2.fwMinor);
-
-    Serial.print(F("[LR1110] WiFi firmware1: "));
-    Serial.print(version2.fwMajorWiFi);
-    Serial.print('.');
-    Serial.println(version2.fwMinorWiFi);
-
-    Serial.print(F("[LR1110] GNSS firmware1: "));
-    Serial.print(version2.fwGNSS);
-    Serial.print('.');
-    Serial.println(version2.almanacGNSS);
-
-  } else {
-    Serial.print(F("failed_radio №2:, code "));
-    Serial.println(state2);
-    while (true) { delay(10); }
-  }
-  #endif
-
-  Serial.println(F("****************** [LR1110] END firmware versions ******************** "));
-  
-}
 
 
 
@@ -414,12 +193,16 @@ void radioBeginAll()
   //radio1.setCRC(2);
 
   if (state_1 == RADIOLIB_ERR_NONE) {
+    #ifdef DEBUG_PRINT
     print_to_terminal_radio_state(RADIO_1_NAME, F("INIT_GOOD"));
+    #endif
     displayPrintState(5, 5, RADIO_1_NAME, F("INIT_GOOD"));
   } else {
 
     String str = "ERROR " + (String)state_1;
+    #ifdef DEBUG_PRINT
     print_to_terminal_radio_state(RADIO_1_NAME, str);
+    #endif
     displayPrintState(5, 5, RADIO_1_NAME, str);
     while (true);
   }
@@ -431,18 +214,22 @@ void radioBeginAll()
   #ifdef RADIO_2
   //Инициализируем радиотрансивер 2 со значениями по-умолчанию
   Serial.println(" ");
-  Serial.print(F("Initializing radio 2 ... "));
+  Serial.println(F("RADIO_2 INIT ...."));
   //Инициализируем просто значениями по-умолчанию
   int state_2 = radio2.begin();
   //radio2.explicitHeader();
   //radio2.setCRC(2);
 
   if (state_2 == RADIOLIB_ERR_NONE) {
+    #ifdef DEBUG_PRINT
     print_to_terminal_radio_state(RADIO_2_NAME, F("INIT_GOOD"));
+    #endif
     displayPrintState(5, 20, RADIO_2_NAME, F("INIT_GOOD"));
   } else {
     String str = "ERROR " + (String)state_2;
+    #ifdef DEBUG_PRINT
     print_to_terminal_radio_state(RADIO_2_NAME, str);
+    #endif
     displayPrintState(5, 20, RADIO_2_NAME, str);
     while (true);
   }
@@ -457,37 +244,6 @@ void radioBeginAll()
 
 
 
-/**
- * @brief Настройка радио передатчика в соответствии с директивами,
- * которые заданы в файле "settings.h"
- * 
- */
-void setRadioMode()
-{
-  //Задаём параметры конфигурации радиотрансивера 1
-  config_radio1.frequency = RADIO_1_FREQ;
-  config_radio1.bandwidth = RADIO_1_BANDWIDTH;
-  config_radio1.spreadingFactor = RADIO_1_SPREAD_FACTOR;
-  config_radio1.codingRate = RADIO_1_CODING_RATE;
-  config_radio1.syncWord = RADIO_1_SYNC_WORD;
-  config_radio1.outputPower = RADIO_1_OUTPUT_POWER;
-  config_radio1.currentLimit = RADIO_1_CURRENT_LIMIT;
-  config_radio1.preambleLength = RADIO_1_PREAMBLE_LENGTH;
-  config_radio1.gain = RADIO_1_GAIN;
-
-  #ifdef RADIO_2
-  //Задаём параметры конфигурации радиотрансивера 2
-  config_radio2.frequency = RADIO_2_FREQ;
-  config_radio2.bandwidth = RADIO_2_BANDWIDTH;
-  config_radio2.spreadingFactor = RADIO_2_SPREAD_FACTOR;
-  config_radio2.codingRate = RADIO_2_CODING_RATE;
-  config_radio2.syncWord = RADIO_2_SYNC_WORD;
-  config_radio2.outputPower = RADIO_2_OUTPUT_POWER;
-  config_radio2.currentLimit = RADIO_2_CURRENT_LIMIT;
-  config_radio2.preambleLength = RADIO_2_PREAMBLE_LENGTH;
-  config_radio2.gain = RADIO_2_GAIN;
-  #endif
-}
 
 
 
@@ -500,65 +256,94 @@ void setRadioMode()
 */
 void radio_setSettings(LR1121 radio, LORA_CONFIGURATION config_radio, String radio_name)
 {
+  #ifdef DEBUG_PRINT
   Serial.print(TABLE_LEFT);
   Serial.print(F("SET SETTINGTH OF RADIO "));
   Serial.print(radio_name);
   Serial.println(TABLE_RIGHT);
+  #endif
   
   // Устанавливаем необходимую нам частоту работы трансивера
   if (radio.setFrequency(config_radio.frequency) == RADIOLIB_ERR_INVALID_FREQUENCY) {
+    #ifdef DEBUG_PRINT
     Serial.println(F("Selected frequency is invalid for this module!"));
+    #endif
     while (true);
   }
+  #ifdef DEBUG_PRINT
   Serial.print(F("Set frequency = "));
   Serial.println(config_radio.frequency);
+  #endif
 
 
   // установить полосу пропускания до 250 кГц
   if (radio.setBandwidth(config_radio.bandwidth) == RADIOLIB_ERR_INVALID_BANDWIDTH) {
+    #ifdef DEBUG_PRINT
     Serial.println(F("Selected bandwidth is invalid for this module!"));
+    #endif
     while (true);
   }
+  #ifdef DEBUG_PRINT
   Serial.print(F("Set bandWidth = "));
   Serial.println(config_radio.bandwidth);
+  #endif
 
   // коэффициент расширения 
   if (radio.setSpreadingFactor(config_radio.spreadingFactor) == RADIOLIB_ERR_INVALID_SPREADING_FACTOR) {
+    #ifdef DEBUG_PRINT
     Serial.println(F("Selected spreading factor is invalid for this module!"));
+    #endif
     while (true);
   }
+  #ifdef DEBUG_PRINT
   Serial.print(F("Set spreadingFactor = "));
   Serial.println(config_radio.spreadingFactor);
+  #endif
 
   // установить скорость кодирования
   if (radio.setCodingRate(config_radio.codingRate) == RADIOLIB_ERR_INVALID_CODING_RATE) {
+    #ifdef DEBUG_PRINT
     Serial.println(F("Selected coding rate is invalid for this module!"));
+    #endif
     while (true);
   }
+  #ifdef DEBUG_PRINT
   Serial.print(F("Set codingRate = "));
   Serial.println(config_radio.codingRate);
+  #endif
 
   // Устанавливаем слово синхронизации
   if (radio.setSyncWord(config_radio.syncWord) != RADIOLIB_ERR_NONE) {
+    #ifdef DEBUG_PRINT
     Serial.println(F("Unable to set sync word!"));
+    #endif
     while (true);
   }
+  #ifdef DEBUG_PRINT
   Serial.print(F("Set syncWord = "));
   Serial.println(config_radio.syncWord);
+  #endif
 
   // Устанавливаем выходную мощность трансивера
   if (radio.setOutputPower(config_radio.outputPower) == RADIOLIB_ERR_INVALID_OUTPUT_POWER) {
+    #ifdef DEBUG_PRINT
     Serial.println(F("Selected output power is invalid for this module!"));
+    #endif
     while (true);
   }
+  #ifdef DEBUG_PRINT
   Serial.print(F("Set setOutputPower = "));
   Serial.println(config_radio.outputPower); 
+  #endif
 
   // установить длину преамбулы (допустимый диапазон 6 - 65535)
   if (radio.setPreambleLength(config_radio.preambleLength) == RADIOLIB_ERR_INVALID_PREAMBLE_LENGTH) {
+    #ifdef DEBUG_PRINT
     Serial.println(F("Selected preamble length is invalid for this module!"));
+    #endif
     while (true);
   }
+  #ifdef DEBUG_PRINT
   Serial.print(F("Set preambleLength = "));
   Serial.println(config_radio.preambleLength);
 
@@ -571,6 +356,7 @@ void radio_setSettings(LR1121 radio, LORA_CONFIGURATION config_radio, String rad
   Serial.print(radio_name);
   Serial.println(TABLE_RIGHT);
   Serial.println(SPACE);
+  #endif
 }
 
 
@@ -642,17 +428,26 @@ void radio_setSettings(LR1121 radio, LORA_CONFIGURATION config_radio, String rad
 
 void setup() {
   //Инициализируем сериал-монитор со скоростью 115200
+  #ifdef DEBUG_PRINT
   Serial.begin(115200);
+  #endif
+
+  display_wire.begin(I2C_SDA_PIN, I2C_SCL_PIN, 100000);
   SPI_MODEM.begin(SCK_RADIO, MISO_RADIO, MOSI_RADIO);
+  
+  #ifdef DEBUG_PRINT
   Serial.printf("Chip Model %s, ChipRevision %d, Cpu Freq %d, SDK Version %s\n", ESP.getChipModel(), ESP.getChipRevision(), ESP.getCpuFreqMHz(), ESP.getSdkVersion());
+  #endif
     
   //инициализируем дисплей
   displayInit();
 
+  #ifdef DEBUG_PRINT
   Serial.print(TABLE_LEFT);
   Serial.print(F("DISPLAY INIT"));
   Serial.println(TABLE_RIGHT);
   Serial.println(SPACE);
+  #endif
   
   pinMode(LED_PIN, OUTPUT);      //Контакт управления светодиодом (на плате LOLIN D32 он на пине 5)
   pinMode(FUN, OUTPUT);          //Контакт управления вентилятором охлаждения
@@ -664,10 +459,14 @@ void setup() {
 
   radioBeginAll();
   
+  #ifdef DEBUG_PRINT
   printVersions();
+  #endif
 
+  #ifdef DEBUG_PRINT
   Serial.println(SPACE);
   Serial.println(SPACE);
+  #endif
     
   //Устанавливаем наши значения, определённые ранее в структуре config_radio1
   radio_setSettings(radio1, config_radio1, "1");
@@ -718,11 +517,12 @@ void setup() {
     radio2.setPacketSentAction(setFlag_2);
     #endif
 
-
+    #ifdef DEBUG_PRINT
     //Начинаем передачу пакетов
     Serial.print(TABLE_LEFT);
     Serial.print(F("SENDING FIRST PACKET"));
     Serial.println(TABLE_RIGHT);
+    #endif
 
     String str = F("START!");
     transmit_and_print_data(str);
@@ -732,8 +532,9 @@ void setup() {
 
   #endif
   
-
+  #ifdef DEBUG_PRINT
   Serial.println(F("**************************************"));
+  #endif
 
   digitalWrite(LED_PIN, HIGH);      //Выключаем светодиод, сигнализация об окончании передачи/приёма пакета
 
@@ -752,31 +553,9 @@ void setup() {
 
 
 
-  #ifdef TEST
-    // //Устанавливаем функцию, которая будет вызываться при получении пакета данных
-    // radio1.setPacketReceivedAction(setFlag);
-
-    // //Начинаем слушать есть ли пакеты
-    // Serial.print(F("[SX1278] Starting to listen ... "));
-    // state = radio1.startReceive();
-
-    // if (state == RADIOLIB_ERR_NONE) {
-    //   Serial.println(F("success!"));
-    //   digitalWrite(LED_PIN, LOW);     //Включаем светодиод, сигнализация об передаче/приёма пакета
-    //   test_is_ok = true;
-    // } else {
-    //   test_is_ok = false;
-    //   Serial.print(F("failed, code: "));
-    //   Serial.println(state);
-    //   Serial.print(F("test_is_ok = "));
-    //   Serial.println(test_is_ok);
-    //   while (true);
-    // }
-  #endif
-
-
-  
+  #ifdef DEBUG_PRINT
   Serial.println(" ");
+  #endif
 }
 
  
@@ -805,7 +584,9 @@ void loop() {
 
   #ifdef TRANSMITTER   //Если определен как передатчик
     //проверяем, была ли предыдущая передача успешной
+    #ifdef DEBUG_PRINT
     Serial.println("..................................................");
+    #endif
     if(operationDone_1) {
       
       //Сбрасываем сработавший флаг прерывания
@@ -824,36 +605,50 @@ void loop() {
 
     if (state == RADIOLIB_LORA_DETECTED) {
       // LoRa packet was detected
+      #ifdef DEBUG_PRINT
       Serial.println(F("[LR1110] Packet detected!"));
+      #endif
 
     } else if (state == RADIOLIB_CHANNEL_FREE) {
       // channel is free
+      #ifdef DEBUG_PRINT
       Serial.println(F("[LR1110] Channel is free!"));
+      #endif
 
     } else {
       // some other error occurred
+      #ifdef DEBUG_PRINT
       Serial.print(F("[LR1110] Failed, code "));
       Serial.println(state);
+      #endif
 
     }
 
+    #ifdef DEBUG_PRINT
     Serial.println(F("[LR1110] Scanning channel for LoRa transmission ... "));
+    #endif
 
     // start scanning current channel
     state = radio1.scanChannel();
 
     if (state == RADIOLIB_LORA_DETECTED) {
       // LoRa preamble was detected
+      #ifdef DEBUG_PRINT
       Serial.println(F("detected!"));
+      #endif
 
     } else if (state == RADIOLIB_CHANNEL_FREE) {
       // no preamble was detected, channel is free
+      #ifdef DEBUG_PRINT
       Serial.println(F("channel is free!"));
+      #endif
 
     } else {
       // some other error occurred
+      #ifdef DEBUG_PRINT
       Serial.print(F("failed, code "));
       Serial.println(state);
+      #endif
 
     }
 
@@ -874,15 +669,7 @@ void loop() {
     #endif
   #endif
 
-  #ifdef TEST
-    // if(test_is_ok)
-    // {
-    //   delay(1000);
-    //   digitalWrite(LED_PIN, LOW); //Выключаем светодиод, сигнализация об окончании передачи/приёма пакета
-    // }
-  #endif
-
-
+  
 }
 
 
