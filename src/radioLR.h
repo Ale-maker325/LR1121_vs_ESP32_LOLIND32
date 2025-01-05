@@ -202,13 +202,6 @@ static const Module::RfSwitchMode_t rfswitch_table_2[] = {
 
 
 
-
-
-
-
-
-
-
 typedef uint8_t Radio_Number;
 enum
 {

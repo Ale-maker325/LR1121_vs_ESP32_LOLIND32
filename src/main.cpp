@@ -444,15 +444,15 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);      //Контакт управления светодиодом (на плате LOLIN D32 он на пине 5)
   pinMode(FUN, OUTPUT);          //Контакт управления вентилятором охлаждения
   
+  setRadioMode();
+
+  radioBeginAll();
+
   // установить конфигурацию управления радиочастотным переключателем, это необходимо сделать до вызова метода Begin()
   radio1.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table_1);
   #ifdef RADIO_2
   radio2.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table_2);
   #endif
-  
-  setRadioMode();
-
-  radioBeginAll();
   
   #ifdef DEBUG_PRINT
   printVersions();

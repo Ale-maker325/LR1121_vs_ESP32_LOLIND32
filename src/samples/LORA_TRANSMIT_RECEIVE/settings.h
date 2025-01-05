@@ -37,7 +37,7 @@
 
 #ifdef RADIO_2
 //Задаём параметры конфигурации радиотрансивера 2
-#define RADIO_2_FREQ 455
+#define RADIO_2_FREQ 2422
 #define RADIO_2_BANDWIDTH 125
 #define RADIO_2_SPREAD_FACTOR 9
 #define RADIO_2_CODING_RATE 7
