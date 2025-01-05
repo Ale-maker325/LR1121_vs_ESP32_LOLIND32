@@ -76,9 +76,11 @@ void radioBeginAll()
   
   //Инициализируем радиотрансивер 1 со значениями по-умолчанию, заданными в
   //структуре LORA_CONFIGURATION
+  #ifdef DEBUG_PRINT
   Serial.println(" ");
   Serial.print(RADIO_1_NAME);
   Serial.println(F(" INIT....."));
+  #endif
 
   digitalWrite(NSS_PIN_1, LOW);
   #ifdef RADIO_2
@@ -262,9 +264,100 @@ void radio_setSettings(LR1121 radio, LORA_CONFIGURATION config_radio, String rad
 
 
 
+// flag to indicate that a scan was completed
+volatile bool scanFlag = false;
+
+void wifi_scan(LR1121 radio, void (*func)(void))
+{
+  int state;
+  
+  
+  // scan all WiFi signals with default scan configuration
+  Serial.print(F("[LR1110] Starting passive WiFi scan ... "));
+  state = radio.startWifiScan('*');
+  if (state == RADIOLIB_ERR_NONE) {
+    Serial.println(F("success!"));
+  } else {
+    Serial.print(F("failed, code "));
+    Serial.println(state);
+    Serial.println(" ");
+  }
+
+  scanFlag = false;
 
 
 
+  if(scanFlag) {
+    // reset flag
+    scanFlag = false;
+
+    // get the number of scan results
+    uint8_t count = 0;
+    Serial.print(F("[LR1110] Reading WiFi scan results ... "));
+    int state = radio.getWifiScanResultsCount(&count);
+    if(state == RADIOLIB_ERR_NONE) {
+      Serial.println(F("success!"));
+
+      // print the table header
+      Serial.print(F("[LR1110] Reading "));
+      Serial.print(count);
+      Serial.println(F(" scan results:"));
+      Serial.println(F(" # | WiFi type\t| Frequency\t| MAC Address\t    | Country\t| RSSI [dBm]\t| SSID"));
+
+      // read all results one by one
+      // this result type contains the most information, including the SSID
+      LR11x0WifiResultExtended_t result;
+      for(int i = 0; i < count; i++) {
+        if(i < 10) { Serial.print(" "); } Serial.print(i); Serial.print(" | ");
+        state = radio.getWifiScanResult(&result, i);
+        if(state != RADIOLIB_ERR_NONE) {
+          Serial.print(F("Failed to read result, code "));
+          Serial.println(state);
+          continue;
+        }
+
+        // print the basic information
+        Serial.print(F("802.11")); Serial.print(result.type); Serial.print("\t| ");
+        Serial.print(result.channelFreq); Serial.print(" MHz\t| ");
+
+        // print MAC address
+        for(int j = 0; j < 6; j++) {
+          if(result.mac[j] < 0x10) { Serial.print("0"); }
+          Serial.print(result.mac[j], HEX);
+          if(j < 5) { Serial.print(":"); }
+        }
+        Serial.print(" | ");
+
+        // print the two-letter country code
+        String country = result.countryCode;
+        Serial.print(country);
+        Serial.print("  \t| ");
+
+        // print the RSSI
+        Serial.print(result.rssi);
+        Serial.print("\t| ");
+        
+        // print the network SSID
+        Serial.println((char*)result.ssid);
+      }
+    
+    } else {
+      // some other error occurred
+      Serial.print(F("failed, code "));
+      Serial.println(state);
+    }
+    
+    // start scanning again
+    Serial.print(F("[LR1110] Starting passive WiFi scan ... "));
+    state = radio.startWifiScan('*');
+    if (state == RADIOLIB_ERR_NONE) {
+      Serial.println(F("success!"));
+    } else {
+      Serial.print(F("failed, code "));
+      Serial.println(state);
+    }
+  }
+}
 
 
 
@@ -352,7 +445,10 @@ void setup() {
   pinMode(FUN, OUTPUT);          //Контакт управления вентилятором охлаждения
   
   // установить конфигурацию управления радиочастотным переключателем, это необходимо сделать до вызова метода Begin()
-  radio1.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table);
+  radio1.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table_1);
+  #ifdef RADIO_2
+  radio2.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table_2);
+  #endif
   
   setRadioMode();
 
@@ -384,7 +480,7 @@ void setup() {
     //Устанавливаем функцию, которая будет вызываться при получении пакета данных
     radio1.setPacketReceivedAction(setFlag_1);
     #ifdef RADIO_2
-    radio1.setPacketReceivedAction(setFlag_2);
+    radio2.setPacketReceivedAction(setFlag_2);
     #endif
 
     #ifdef DEBUG_PRINT
@@ -448,7 +544,11 @@ void setup() {
     radio1.setPacketSentAction(setFlag_1);
     #ifdef RADIO_2
     //Устанавливаем функцию, которая будет вызываться при отправке пакета данных модемом №2
-    radio2.setPacketSentAction(setFlag_2);
+    //radio2.setPacketSentAction(setFlag_2);
+
+    radio2.setIrqAction(setFlag_2);
+    Serial.println(F("***** radio2.setIrqAction(setFlag_2) *****"));
+    wifi_scan(radio2, setFlag_2);
     #endif
 
     #ifdef DEBUG_PRINT

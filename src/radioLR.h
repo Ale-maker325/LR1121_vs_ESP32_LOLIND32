@@ -171,7 +171,7 @@ static const uint32_t rfswitch_dio_pins[] = {
 // };
 
 
-static const Module::RfSwitchMode_t rfswitch_table[] = {
+static const Module::RfSwitchMode_t rfswitch_table_1[] = {
   // mode                  DIO5  DIO6 
   { LR11x0::MODE_STBY,   { LOW,  LOW, HIGH, LOW } },
   { LR11x0::MODE_RX,     { LOW, HIGH, HIGH, HIGH  } },
@@ -182,6 +182,20 @@ static const Module::RfSwitchMode_t rfswitch_table[] = {
   { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
   END_OF_MODE_TABLE,
 };
+
+#ifdef RADIO_2
+static const Module::RfSwitchMode_t rfswitch_table_2[] = {
+  // mode                  DIO5  DIO6 
+  { LR11x0::MODE_STBY,   { LOW,  LOW, HIGH, LOW } },
+  { LR11x0::MODE_RX,     { LOW, HIGH, HIGH, HIGH  } },
+  { LR11x0::MODE_TX,     { HIGH, LOW, LOW, LOW } },
+  { LR11x0::MODE_TX_HP,  { HIGH, LOW, HIGH, LOW } },
+  { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
+  { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
+  { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
+  END_OF_MODE_TABLE,
+};
+#endif
 
 
 
