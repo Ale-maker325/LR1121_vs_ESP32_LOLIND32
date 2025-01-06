@@ -449,9 +449,9 @@ void setup() {
   radioBeginAll();
 
   // установить конфигурацию управления радиочастотным переключателем, это необходимо сделать до вызова метода Begin()
-  radio1.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table_1);
+  radio1.setRfSwitchTable(rfswitch_dio_pins_1, rfswitch_table_1);
   #ifdef RADIO_2
-  radio2.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table_2);
+  radio2.setRfSwitchTable(rfswitch_dio_pins_2, rfswitch_table_2);
   #endif
   
   #ifdef DEBUG_PRINT
@@ -544,11 +544,11 @@ void setup() {
     radio1.setPacketSentAction(setFlag_1);
     #ifdef RADIO_2
     //Устанавливаем функцию, которая будет вызываться при отправке пакета данных модемом №2
-    //radio2.setPacketSentAction(setFlag_2);
+    radio2.setPacketSentAction(setFlag_2);
 
-    radio2.setIrqAction(setFlag_2);
-    Serial.println(F("***** radio2.setIrqAction(setFlag_2) *****"));
-    wifi_scan(radio2, setFlag_2);
+    // radio2.setIrqAction(setFlag_2);
+    // Serial.println(F("***** radio2.setIrqAction(setFlag_2) *****"));
+    // wifi_scan(radio2, setFlag_2);
     #endif
 
     #ifdef DEBUG_PRINT

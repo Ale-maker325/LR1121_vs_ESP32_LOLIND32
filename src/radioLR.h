@@ -131,38 +131,23 @@ IRAM_ATTR void setFlag_2(void) {
 
 
 
-// // установите конфигурацию радиочастотного переключателя для Wio WM1110
-// // Wio WM1110 использует DIO5 и DIO6 для радиочастотного переключения.
-// // ПРИМЕЧАНИЕ: другие платы могут отличаться!
-// static const uint32_t rfswitch_dio_pins[] = { 
-//   RADIOLIB_LR11X0_DIO7, RADIOLIB_LR11X0_DIO8,
-//   RADIOLIB_NC, RADIOLIB_NC, RADIOLIB_NC
-// };
-
-
-
-// static const Module::RfSwitchMode_t rfswitch_table[] = {
-//   // mode                  DIO7  DIO8 
-//   { LR11x0::MODE_STBY,   { LOW,  LOW  } },
-//   { LR11x0::MODE_RX,     { HIGH, LOW  } },
-//   { LR11x0::MODE_TX,     { HIGH, HIGH } },
-//   { LR11x0::MODE_TX_HP,  { LOW,  HIGH } },
-//   { LR11x0::MODE_TX_HF,  { LOW,  LOW  } },
-//   { LR11x0::MODE_GNSS,   { LOW,  LOW  } },
-//   { LR11x0::MODE_WIFI,   { LOW,  LOW  } },
-//   END_OF_MODE_TABLE,
-// };
-
-
+// set RF switch configuration for Wio WM1110
+// Wio WM1110 uses DIO5 and DIO6 for RF switching
+// NOTE: other boards may be different!
+static const uint32_t rfswitch_dio_pins_1[] = { 
+  RADIOLIB_LR11X0_DIO5, RADIOLIB_LR11X0_DIO6,
+  RADIOLIB_LR11X0_DIO7, RADIOLIB_LR11X0_DIO8, RADIOLIB_NC
+};
 
 
 // set RF switch configuration for Wio WM1110
 // Wio WM1110 uses DIO5 and DIO6 for RF switching
 // NOTE: other boards may be different!
-static const uint32_t rfswitch_dio_pins[] = { 
+static const uint32_t rfswitch_dio_pins_2[] = { 
   RADIOLIB_LR11X0_DIO5, RADIOLIB_LR11X0_DIO6,
   RADIOLIB_LR11X0_DIO7, RADIOLIB_LR11X0_DIO8, RADIOLIB_NC
 };
+
 
 
 // static const uint32_t rfswitch_dio_pins[] = { 
@@ -172,12 +157,15 @@ static const uint32_t rfswitch_dio_pins[] = {
 
 
 static const Module::RfSwitchMode_t rfswitch_table_1[] = {
-  // mode                  DIO5  DIO6 
-  { LR11x0::MODE_STBY,   { LOW,  LOW, HIGH, LOW } },
-  { LR11x0::MODE_RX,     { LOW, HIGH, HIGH, HIGH  } },
-  { LR11x0::MODE_TX,     { HIGH, LOW, LOW, LOW } },
-  { LR11x0::MODE_TX_HP,  { HIGH, LOW, HIGH, LOW } },
+  // mode                  DIO5  DIO6 DIO7 DIO8
+  { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
+  
+  { LR11x0::MODE_RX,     { LOW, LOW, LOW, HIGH  } },
+  { LR11x0::MODE_TX,     { LOW, LOW, HIGH, LOW } },
+  
+  { LR11x0::MODE_TX_HP,  { LOW, LOW, LOW, LOW } },
   { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
+  
   { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
   { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
   END_OF_MODE_TABLE,
@@ -185,17 +173,24 @@ static const Module::RfSwitchMode_t rfswitch_table_1[] = {
 
 #ifdef RADIO_2
 static const Module::RfSwitchMode_t rfswitch_table_2[] = {
-  // mode                  DIO5  DIO6 
-  { LR11x0::MODE_STBY,   { LOW,  LOW, HIGH, LOW } },
-  { LR11x0::MODE_RX,     { LOW, HIGH, HIGH, HIGH  } },
-  { LR11x0::MODE_TX,     { HIGH, LOW, LOW, LOW } },
-  { LR11x0::MODE_TX_HP,  { HIGH, LOW, HIGH, LOW } },
-  { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
+  // mode                  DIO5  DIO6 DIO7 DIO8
+  { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
+  
+  { LR11x0::MODE_RX,     { HIGH, LOW, LOW, HIGH  } },
+  { LR11x0::MODE_TX,     { HIGH, HIGH, HIGH, LOW } },
+  
+  { LR11x0::MODE_TX_HP,  { HIGH, HIGH, LOW, HIGH } },
+  { LR11x0::MODE_TX_HF,  { HIGH,  LOW, HIGH,  LOW  } },
+
   { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
   { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
   END_OF_MODE_TABLE,
 };
 #endif
+
+
+
+
 
 
 
@@ -351,4 +346,4 @@ void detectedPreamble(Radio_Number radioNumber)
 
 
 
-#endif
+#endif;
