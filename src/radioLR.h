@@ -176,16 +176,32 @@ static const Module::RfSwitchMode_t rfswitch_table_2[] = {
   // mode                  DIO5  DIO6 DIO7 DIO8
   { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
   
-  { LR11x0::MODE_RX,     { HIGH, LOW, LOW, HIGH  } },
-  { LR11x0::MODE_TX,     { HIGH, HIGH, HIGH, LOW } },
+  { LR11x0::MODE_RX,     { LOW, LOW, LOW, HIGH  } },
+  { LR11x0::MODE_TX,     { LOW, LOW, LOW, LOW } },
   
-  { LR11x0::MODE_TX_HP,  { HIGH, HIGH, LOW, HIGH } },
-  { LR11x0::MODE_TX_HF,  { HIGH,  LOW, HIGH,  LOW  } },
+  { LR11x0::MODE_TX_HP,  { LOW, LOW, LOW, LOW } },
+  { LR11x0::MODE_TX_HF,  { LOW,  LOW, HIGH,  LOW  } },
 
   { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
   { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
   END_OF_MODE_TABLE,
 };
+
+// #ifdef RADIO_2
+// static const Module::RfSwitchMode_t rfswitch_table_2[] = {
+//   // mode                  DIO5  DIO6 DIO7 DIO8
+//   { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
+  
+//   { LR11x0::MODE_RX,     { HIGH, HIGH, HIGH, HIGH  } },
+//   { LR11x0::MODE_TX,     { HIGH, HIGH, HIGH, HIGH } },
+  
+//   { LR11x0::MODE_TX_HP,  { HIGH, HIGH, HIGH, HIGH } },
+//   { LR11x0::MODE_TX_HF,  { HIGH,  HIGH, HIGH,  LOW  } },
+
+//   { LR11x0::MODE_GNSS,   { HIGH,  HIGH, HIGH,  HIGH  } },
+//   { LR11x0::MODE_WIFI,   { HIGH,  HIGH, HIGH,  HIGH  } },
+//   END_OF_MODE_TABLE,
+// };
 #endif
 
 
