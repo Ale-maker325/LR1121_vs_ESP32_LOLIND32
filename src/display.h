@@ -4,6 +4,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <radioLR.h>
+#include <settings.h>
 
 
 #define SCREEN_WIDTH 128              // Ширина дисплея в пикселах
@@ -15,15 +16,15 @@ TwoWire display_wire = TwoWire(0);
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &display_wire, OLED_RESET); //Создаём объект дисплея
 
-#ifdef TRANSMITTER
-String RADIO_1_NAME = F("TX_1");
-String RADIO_2_NAME = F("TX_2");
-#endif
+// #ifdef TRANSMITTER
+// String RADIO_1_NAME = F("TX_1");
+// String RADIO_2_NAME = F("TX_2");
+// #endif
 
-#ifdef RECEIVER
-String RADIO_1_NAME = F("RX_1");
-String RADIO_2_NAME = F("RX_2");
-#endif
+// #ifdef RECEIVER
+// String RADIO_1_NAME = F("RX_1");
+// String RADIO_2_NAME = F("RX_2");
+// #endif
 
 
 
@@ -304,8 +305,8 @@ void transmit_and_print_data(String &transmit_str)
   WaitOnBusy(Radio_2);
   //Печатаем данные куда надо (в сериал, если он активирован, и на дисплей)
   printStateResultTX(state_2, transmit_str, Radio_2);
-  WaitOnBusy(Radio_2);
-  //Оканчиваем передачу первым передатчиком
+  
+  //Оканчиваем передачу вторым передатчиком
   state_2 = radio2.finishTransmit();
   //state_2 = radio2.startReceive();
 

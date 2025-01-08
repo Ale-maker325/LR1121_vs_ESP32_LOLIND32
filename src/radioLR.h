@@ -7,6 +7,8 @@
 #include <RadioLib.h>
 #include <stdint.h>
 #include <settings.h>
+#include <display.h>
+
 
 
 
@@ -16,9 +18,9 @@ int state_2 = RADIOLIB_ERR_NONE; // Переменная, хранящая ко�
 SPIClass SPI_MODEM;
 
 
-LR1121 radio1 = new Module(NSS_PIN_1, IRQ_PIN_1, NRST_PIN_1, BUSY_PIN_1, SPI_MODEM); //Инициализируем экземпляр радио
+LR1121 radio1 = new Module(NSS_PIN_1, IRQ_PIN_1, NRST_PIN_1, BUSY_PIN_1, SPI_MODEM); //Инициализируем экземпляр радио_1
 #ifdef RADIO_2
-LR1121 radio2 = new Module(NSS_PIN_2, IRQ_PIN_2, NRST_PIN_2, BUSY_PIN_2, SPI_MODEM); //Инициализируем экземпляр радио
+LR1121 radio2 = new Module(NSS_PIN_2, IRQ_PIN_2, NRST_PIN_2, BUSY_PIN_2, SPI_MODEM); //Инициализируем экземпляр радио_2
 #endif
 
 
@@ -95,7 +97,7 @@ volatile bool operationDone_1 = false;
 
 // Эта функция вызывается, когда модем №1 передает или получает полный пакет
 // ВАЖНО: эта функция ДОЛЖНА БЫТЬ 'пуста' типа и НЕ должна иметь никаких аргументов!
-IRAM_ATTR void setFlag_1(void) {
+IRAM_ATTR void flag_operationDone_1(void) {
 // мы отправили или получили пакет, установите флаг
   operationDone_1 = true;
 }
@@ -108,7 +110,7 @@ volatile bool operationDone_2 = false;
 
 // Эта функция вызывается, когда модем №2 передает или получает полный пакет
 // ВАЖНО: эта функция ДОЛЖНА БЫТЬ 'пуста' типа и НЕ должна иметь никаких аргументов!
-IRAM_ATTR void setFlag_2(void) {
+IRAM_ATTR void flag_operationDone_2(void) {
 // мы отправили или получили пакет, установите флаг
   operationDone_2 = true;
 }
@@ -160,10 +162,10 @@ static const Module::RfSwitchMode_t rfswitch_table_1[] = {
   // mode                  DIO5  DIO6 DIO7 DIO8
   { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
   
-  { LR11x0::MODE_RX,     { LOW, LOW, LOW, HIGH  } },
-  { LR11x0::MODE_TX,     { LOW, LOW, HIGH, LOW } },
+  { LR11x0::MODE_RX,     { HIGH, LOW, LOW, HIGH  } },
+  { LR11x0::MODE_TX,     { LOW, HIGH, HIGH, LOW } },
   
-  { LR11x0::MODE_TX_HP,  { LOW, LOW, LOW, LOW } },
+  { LR11x0::MODE_TX_HP,  { LOW, HIGH, LOW, LOW } },
   { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
   
   { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
@@ -176,10 +178,10 @@ static const Module::RfSwitchMode_t rfswitch_table_2[] = {
   // mode                  DIO5  DIO6 DIO7 DIO8
   { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
   
-  { LR11x0::MODE_RX,     { LOW, LOW, LOW, HIGH  } },
-  { LR11x0::MODE_TX,     { LOW, LOW, LOW, LOW } },
+  { LR11x0::MODE_RX,     { HIGH, LOW, LOW, HIGH  } },
+  { LR11x0::MODE_TX,     { LOW, HIGH, LOW, LOW } },
   
-  { LR11x0::MODE_TX_HP,  { LOW, LOW, LOW, LOW } },
+  { LR11x0::MODE_TX_HP,  { LOW, HIGH, LOW, LOW } },
   { LR11x0::MODE_TX_HF,  { LOW,  LOW, HIGH,  LOW  } },
 
   { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
@@ -355,6 +357,137 @@ void detectedPreamble(Radio_Number radioNumber)
     }
   }
 }
+
+
+
+
+
+
+void print_to_terminal_radio_state(String &RadioName, String state) __attribute__ ((weak));
+void displayPrintState(int16_t x, int16_t y, String &RadioName, String state) __attribute__ ((weak));
+
+
+
+void printRadioBeginResult(int &STATE, Radio_Number radio_number)
+{
+  String radio_name;
+  int x,y;
+
+  switch (radio_number)
+  {
+  case Radio_1: 
+    radio_name = RADIO_1_NAME;
+    x=5;
+    y=5;
+    break;
+  case Radio_2:
+    radio_name = RADIO_2_NAME;
+    x=5;
+    y=20;
+    break;
+  default:
+    break;
+  }
+  if (STATE == RADIOLIB_ERR_NONE) {
+    #ifdef DEBUG_PRINT
+    print_to_terminal_radio_state(radio_name, F("INIT_GOOD"));
+    #endif
+    displayPrintState(x, y, radio_name, F("INIT_GOOD"));
+  } else {
+
+    String str = "ERROR " + (String)STATE;
+    #ifdef DEBUG_PRINT
+    print_to_terminal_radio_state(radio_name, str);
+    #endif
+    displayPrintState(x, y, radio_name, str);
+    while (true);
+  }
+  
+}
+
+
+
+
+
+
+void ICACHE_RAM_ATTR selectRadio(Radio_Number radio_number)
+{
+  switch (radio_number)
+  {
+  //Если выбираем радио 1 
+  case Radio_1:
+    digitalWrite(NSS_PIN_1, LOW);
+    //Если при этом есть и радио 2, то с него снимаем выделение
+    #ifdef RADIO_2
+      digitalWrite(NSS_PIN_2, HIGH);
+    #endif
+    break;
+  //Если имеется радио 2, то выбираем его, сняв выделение с радио 1
+  case Radio_2:
+    digitalWrite(NSS_PIN_1, HIGH);
+    //Если при этом есть и радио 2, то с него снимаем выделение
+    #ifdef RADIO_2
+      digitalWrite(NSS_PIN_2, LOW);
+    #endif
+    break;
+  
+  default:
+    break;
+  }
+}
+
+
+
+
+
+/**
+ * @brief Настройка радио передатчика в соответствии с директивами,
+ * которые заданы в файле "settings.h"
+ */
+void radioBeginAll()
+{
+  pinMode(NSS_PIN_1, OUTPUT);
+  #ifdef RADIO_2
+    pinMode(NSS_PIN_2, OUTPUT);
+  #endif
+  
+  //Инициализируем радиотрансивер 1 со значениями по-умолчанию, заданными в
+  //структуре LORA_CONFIGURATION
+  #ifdef DEBUG_PRINT
+    Serial.println(" ");
+    Serial.print(RADIO_1_NAME);
+    Serial.println(F(" INIT....."));
+  #endif
+
+  selectRadio(Radio_1);
+
+  //Инициализируем просто значениями по-умолчанию
+  int state_1 = radio1.begin();
+  printRadioBeginResult(state_1, Radio_1);
+  WaitOnBusy(Radio_1);
+
+  delay(2000);
+
+  #ifdef RADIO_2
+
+    selectRadio(Radio_2);
+
+    //Инициализируем радиотрансивер 2 со значениями по-умолчанию
+    Serial.println(" ");
+    Serial.println(F("RADIO_2 INIT ...."));
+    //Инициализируем просто значениями по-умолчанию
+    int state_2 = radio2.begin();
+    printRadioBeginResult(state_2, Radio_2);
+    WaitOnBusy(Radio_2);
+    
+    delay(2000);
+    
+  #endif
+}
+
+
+
+
 
 
 
