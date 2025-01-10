@@ -161,13 +161,12 @@ static const uint32_t rfswitch_dio_pins_2[] = {
 static const Module::RfSwitchMode_t rfswitch_table_1[] = {
   // mode                  DIO5  DIO6 DIO7 DIO8
   { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
-  
-  { LR11x0::MODE_RX,     { HIGH, LOW, LOW, HIGH  } },
-  { LR11x0::MODE_TX,     { LOW, HIGH, HIGH, LOW } },
-  
+  { LR11x0::MODE_RX,     { HIGH, LOW, LOW, LOW  } },
+  { LR11x0::MODE_TX,     { LOW, HIGH, LOW, LOW } },
   { LR11x0::MODE_TX_HP,  { LOW, HIGH, LOW, LOW } },
-  { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
   
+  
+  { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
   { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
   { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
   END_OF_MODE_TABLE,
@@ -177,33 +176,16 @@ static const Module::RfSwitchMode_t rfswitch_table_1[] = {
 static const Module::RfSwitchMode_t rfswitch_table_2[] = {
   // mode                  DIO5  DIO6 DIO7 DIO8
   { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
-  
   { LR11x0::MODE_RX,     { HIGH, LOW, LOW, HIGH  } },
   { LR11x0::MODE_TX,     { LOW, HIGH, LOW, LOW } },
-  
   { LR11x0::MODE_TX_HP,  { LOW, HIGH, LOW, LOW } },
-  { LR11x0::MODE_TX_HF,  { LOW,  LOW, HIGH,  LOW  } },
 
+  { LR11x0::MODE_TX_HF,  { LOW,  LOW, HIGH,  LOW  } },
   { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
   { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
   END_OF_MODE_TABLE,
 };
 
-// #ifdef RADIO_2
-// static const Module::RfSwitchMode_t rfswitch_table_2[] = {
-//   // mode                  DIO5  DIO6 DIO7 DIO8
-//   { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
-  
-//   { LR11x0::MODE_RX,     { HIGH, HIGH, HIGH, HIGH  } },
-//   { LR11x0::MODE_TX,     { HIGH, HIGH, HIGH, HIGH } },
-  
-//   { LR11x0::MODE_TX_HP,  { HIGH, HIGH, HIGH, HIGH } },
-//   { LR11x0::MODE_TX_HF,  { HIGH,  HIGH, HIGH,  LOW  } },
-
-//   { LR11x0::MODE_GNSS,   { HIGH,  HIGH, HIGH,  HIGH  } },
-//   { LR11x0::MODE_WIFI,   { HIGH,  HIGH, HIGH,  HIGH  } },
-//   END_OF_MODE_TABLE,
-// };
 #endif
 
 
@@ -290,6 +272,7 @@ void detected_CAD(Radio_Number radioNumber)
   }
   if (radioNumber == Radio_2)
   {
+    #ifdef RADIO_2
     state = radio2.getChannelScanResult();
 
     if (state == RADIOLIB_LORA_DETECTED) {
@@ -305,6 +288,7 @@ void detected_CAD(Radio_Number radioNumber)
       #endif
 
     }
+    #endif
   }
 }
 
@@ -338,6 +322,7 @@ void detectedPreamble(Radio_Number radioNumber)
   }
   if (radioNumber == Radio_2)
   {
+    #ifdef RADIO_2
     // start scanning current channel
     state = radio2.scanChannel();
 
@@ -355,6 +340,7 @@ void detectedPreamble(Radio_Number radioNumber)
       #endif
 
     }
+    #endif
   }
 }
 
@@ -440,6 +426,11 @@ void ICACHE_RAM_ATTR selectRadio(Radio_Number radio_number)
 
 
 
+
+  
+
+
+
 /**
  * @brief Настройка радио передатчика в соответствии с директивами,
  * которые заданы в файле "settings.h"
@@ -459,14 +450,18 @@ void radioBeginAll()
     Serial.println(F(" INIT....."));
   #endif
 
-  selectRadio(Radio_1);
+  // selectRadio(Radio_1);
 
   //Инициализируем просто значениями по-умолчанию
   int state_1 = radio1.begin();
   printRadioBeginResult(state_1, Radio_1);
   WaitOnBusy(Radio_1);
+  // radio1.setRfSwitchTable(rfswitch_dio_pins_1, rfswitch_table_1);
+  // radio1.setOutputPower(22);
 
+  #ifdef DEBUG_PRINT
   delay(2000);
+  #endif
 
   #ifdef RADIO_2
 
@@ -479,8 +474,14 @@ void radioBeginAll()
     int state_2 = radio2.begin();
     printRadioBeginResult(state_2, Radio_2);
     WaitOnBusy(Radio_2);
+    // #ifdef RADIO_2
+    //   radio2.setRfSwitchTable(rfswitch_dio_pins_2, rfswitch_table_2);
+    // #endif
+
     
+    #ifdef DEBUG_PRINT
     delay(2000);
+    #endif
     
   #endif
 }

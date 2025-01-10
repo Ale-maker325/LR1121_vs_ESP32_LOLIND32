@@ -214,11 +214,15 @@ void setup() {
 
   radioBeginAll();
 
-  // установить конфигурацию управления радиочастотным переключателем, это необходимо сделать до вызова метода Begin()
+  // установить конфигурацию управления радиочастотным переключателем
   radio1.setRfSwitchTable(rfswitch_dio_pins_1, rfswitch_table_1);
   #ifdef RADIO_2
   radio2.setRfSwitchTable(rfswitch_dio_pins_2, rfswitch_table_2);
   #endif
+
+  radio1.setOutputPower(14);
+
+
   
   #ifdef DEBUG_PRINT
   printVersions();
@@ -325,7 +329,9 @@ void setup() {
     transmit_and_print_data(str);
     
     digitalWrite(LED_PIN, LOW);     //Включаем светодиод, сигнализация об передаче/приёма пакета
+    #ifdef DEBUG_PRINT
     delay(1000);
+    #endif
 
   #endif
   
@@ -380,7 +386,9 @@ void setup() {
 
 
 void loop() {
-  delay(500);
+  //#ifdef DEBUG_PRINT
+  delay(200);
+  //#endif
   digitalWrite(LED_PIN, HIGH); //Выключаем светодиод, сигнализация об окончании передачи/приёма пакета
   
 

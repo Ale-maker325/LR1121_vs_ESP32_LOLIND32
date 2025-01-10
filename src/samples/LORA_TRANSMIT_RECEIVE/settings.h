@@ -1,15 +1,15 @@
 #pragma once
 #include <Arduino.h>
 
-#define DEBUG_PRINT
+//#define DEBUG_PRINT
 
 /**
  * @brief Следует раскомментировать одно из определений, а другое закомментировать.
  *  - RADIO_1 - раскомментировать если используется одно радио
  *  - RADIO_2 - раскомментировать в случае если будет два радиомодуля
  */
-//#define RADIO_1             //Раскомментировать если будет использован только один модем LR1121
-#define RADIO_2             //Раскомментировать если будет использовано два модема LR1121
+#define RADIO_1             //Раскомментировать если будет использован только один модем LR1121
+//#define RADIO_2             //Раскомментировать если будет использовано два модема LR1121
 
 
 /**
@@ -22,43 +22,9 @@
 
 
 
-/**
- * @brief Включение этого макроса приведет к выводу только базовой отладочной информации,
- * например, тайм-аутов при ожидании сигналов GPIO или невозможности найти радиомодуль из-за
- * несоответствия регистра версии.
-*/
-//#define RADIOLIB_DEBUG_BASIC        (1)   // basic debugging (e.g. reporting GPIO timeouts or module not being found)
-
-/**
- * @brief Включение этого макроса выведет информацию, важную для отладки протоколов. Это очень полезно при отладке LoRaWAN.
- */
-//#define RADIOLIB_DEBUG_PROTOCOL     (1)   // protocol information (e.g. LoRaWAN internal information)
-
-/**
- * @brief Включение этого макроса выведет полную расшифровку всей коммуникации SPI. Следует отметить, что это выводит МНОГО
- * информации в журнал отладки. Это может сделать отладку более высоких уровней (например, протоколов) громоздкой, поэтому
- * ее следует использовать только при расследовании проблем с самим радиомодулем.
- */
-//#define RADIOLIB_DEBUG_SPI          (1)   // verbose transcription of all SPI communication - produces large debug logs!
-
-/**
- * @brief Во время выполнения RadioLib выполняет проверки, чтобы убедиться, что любая ошибка обнаружена как можно быстрее.
- * Это делается с помощью простого макроса утверждения, который возвращается, когда результатом предыдущей операции был
- * код состояния «не ОК». Таким образом, любой заданный публичный метод API возвращается немедленно после обнаружения
- * ошибки. Однако эта ошибка может распространяться через несколько слоев библиотеки, прежде чем достичь пользователя.
- * Чтобы упростить отслеживание таких сбоев, RadioLib предоставляет макрос RADIOLIB_VERBOSE_ASSERT. Если установлено
- * значение 1, этот макрос выведет трассировку сбоя (включая исходный файл и информацию о строке) с использованием
- * RADIOLIB_DEBUG_BASICуровня отладки. Включение этого макроса также включит RADIOLIB_DEBUG_BASIC. Имейте в виду, что,
- * как и при любой отладке, это увеличит размер двоичного файла! Ниже показан пример вывода, в последних двух строках
- * которого показаны информация о файле и строке неудавшихся утверждений.
- */
-//#define RADIOLIB_VERBOSE_ASSERT     (1)   // verbose assertions - will print out file and line number on failure
-
-
-
-
-
 //**************************************************** Параметры радио для компиляции ************************************************
+
+
 
 //Задаём параметры конфигурации радиотрансивера 1
 #define RADIO_1_FREQ 434
@@ -66,10 +32,10 @@
 #define RADIO_1_SPREAD_FACTOR 9
 #define RADIO_1_CODING_RATE 7
 #define RADIO_1_SYNC_WORD RADIOLIB_LR11X0_LORA_SYNC_WORD_PRIVATE
-#define RADIO_1_OUTPUT_POWER 10
-#define RADIO_1_CURRENT_LIMIT 100
+#define RADIO_1_OUTPUT_POWER 22
+#define RADIO_1_CURRENT_LIMIT 200
 #define RADIO_1_PREAMBLE_LENGTH 8
-#define RADIO_1_GAIN 0
+#define RADIO_1_GAIN 10
 
 #ifdef RADIO_2
 //Задаём параметры конфигурации радиотрансивера 2
@@ -78,7 +44,7 @@
 #define RADIO_2_SPREAD_FACTOR 9
 #define RADIO_2_CODING_RATE 7
 #define RADIO_2_SYNC_WORD RADIOLIB_LR11X0_LORA_SYNC_WORD_PRIVATE
-#define RADIO_2_OUTPUT_POWER 10
+#define RADIO_2_OUTPUT_POWER 13
 #define RADIO_2_CURRENT_LIMIT 100
 #define RADIO_2_PREAMBLE_LENGTH 8
 #define RADIO_2_GAIN 0
