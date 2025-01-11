@@ -8,8 +8,8 @@
  *  - RADIO_1 - раскомментировать если используется одно радио
  *  - RADIO_2 - раскомментировать в случае если будет два радиомодуля
  */
-#define RADIO_1             //Раскомментировать если будет использован только один модем LR1121
-//#define RADIO_2             //Раскомментировать если будет использовано два модема LR1121
+//#define RADIO_1             //Раскомментировать если будет использован только один модем LR1121
+#define RADIO_2             //Раскомментировать если будет использовано два модема LR1121
 
 
 /**
@@ -32,10 +32,10 @@
 #define RADIO_1_SPREAD_FACTOR 9
 #define RADIO_1_CODING_RATE 7
 #define RADIO_1_SYNC_WORD RADIOLIB_LR11X0_LORA_SYNC_WORD_PRIVATE
-#define RADIO_1_OUTPUT_POWER 22
+#define RADIO_1_OUTPUT_POWER 15
 #define RADIO_1_CURRENT_LIMIT 200
 #define RADIO_1_PREAMBLE_LENGTH 8
-#define RADIO_1_GAIN 10
+#define RADIO_1_GAIN 0
 
 #ifdef RADIO_2
 //Задаём параметры конфигурации радиотрансивера 2

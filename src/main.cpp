@@ -220,8 +220,7 @@ void setup() {
   radio2.setRfSwitchTable(rfswitch_dio_pins_2, rfswitch_table_2);
   #endif
 
-  radio1.setOutputPower(14);
-
+  
 
   
   #ifdef DEBUG_PRINT
@@ -386,9 +385,9 @@ void setup() {
 
 
 void loop() {
-  //#ifdef DEBUG_PRINT
-  delay(200);
-  //#endif
+  
+  delay(300);
+  
   digitalWrite(LED_PIN, HIGH); //Выключаем светодиод, сигнализация об окончании передачи/приёма пакета
   
 

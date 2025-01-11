@@ -161,9 +161,9 @@ static const uint32_t rfswitch_dio_pins_2[] = {
 static const Module::RfSwitchMode_t rfswitch_table_1[] = {
   // mode                  DIO5  DIO6 DIO7 DIO8
   { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
-  { LR11x0::MODE_RX,     { HIGH, LOW, LOW, LOW  } },
-  { LR11x0::MODE_TX,     { LOW, HIGH, LOW, LOW } },
-  { LR11x0::MODE_TX_HP,  { LOW, HIGH, LOW, LOW } },
+  { LR11x0::MODE_RX,     { LOW, HIGH, HIGH, LOW} },
+  { LR11x0::MODE_TX,     { HIGH, LOW, LOW, LOW } },
+  { LR11x0::MODE_TX_HP,  { HIGH, LOW, LOW, HIGH } },
   
   
   { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
@@ -176,9 +176,9 @@ static const Module::RfSwitchMode_t rfswitch_table_1[] = {
 static const Module::RfSwitchMode_t rfswitch_table_2[] = {
   // mode                  DIO5  DIO6 DIO7 DIO8
   { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
-  { LR11x0::MODE_RX,     { HIGH, LOW, LOW, HIGH  } },
-  { LR11x0::MODE_TX,     { LOW, HIGH, LOW, LOW } },
-  { LR11x0::MODE_TX_HP,  { LOW, HIGH, LOW, LOW } },
+  { LR11x0::MODE_RX,     { LOW, LOW, LOW, LOW  } },
+  { LR11x0::MODE_TX,     { LOW, LOW, LOW, LOW } },
+  { LR11x0::MODE_TX_HP,  { LOW, LOW, LOW, LOW } },
 
   { LR11x0::MODE_TX_HF,  { LOW,  LOW, HIGH,  LOW  } },
   { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
@@ -450,7 +450,9 @@ void radioBeginAll()
     Serial.println(F(" INIT....."));
   #endif
 
-  // selectRadio(Radio_1);
+  #ifdef RADIO_2
+  selectRadio(Radio_1);
+  #endif
 
   //Инициализируем просто значениями по-умолчанию
   int state_1 = radio1.begin();
@@ -460,7 +462,7 @@ void radioBeginAll()
   // radio1.setOutputPower(22);
 
   #ifdef DEBUG_PRINT
-  delay(2000);
+  delay(1000);
   #endif
 
   #ifdef RADIO_2
@@ -480,7 +482,7 @@ void radioBeginAll()
 
     
     #ifdef DEBUG_PRINT
-    delay(2000);
+    delay(1000);
     #endif
     
   #endif

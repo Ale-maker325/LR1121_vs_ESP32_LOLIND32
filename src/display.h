@@ -295,7 +295,7 @@ void transmit_and_print_data(String &transmit_str)
   //Печатаем данные куда надо (в сериал, если он активирован, и на дисплей)
   printStateResultTX(state_1, transmit_str, Radio_1);
   //Оканчиваем передачу первым передатчиком
-  state_1 = radio1.finishTransmit();
+  //state_1 = radio1.finishTransmit();
   //state_1 = radio1.startReceive();
 
   #ifdef RADIO_2
@@ -307,7 +307,7 @@ void transmit_and_print_data(String &transmit_str)
   printStateResultTX(state_2, transmit_str, Radio_2);
   
   //Оканчиваем передачу вторым передатчиком
-  state_2 = radio2.finishTransmit();
+  //state_2 = radio2.finishTransmit();
   //state_2 = radio2.startReceive();
 
   #endif  
