@@ -324,7 +324,7 @@ void setup() {
     Serial.println(TABLE_RIGHT);
     #endif
 
-    String str = F("START!");
+    String str = F("RADIO START!");
     transmit_and_print_data(str);
     
     digitalWrite(LED_PIN, LOW);     //Включаем светодиод, сигнализация об передаче/приёма пакета

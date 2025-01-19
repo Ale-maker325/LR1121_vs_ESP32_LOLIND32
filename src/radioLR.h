@@ -130,9 +130,6 @@ IRAM_ATTR void flag_operationDone_2(void) {
 
 
 
-
-
-
 // set RF switch configuration for Wio WM1110
 // Wio WM1110 uses DIO5 and DIO6 for RF switching
 // NOTE: other boards may be different!
@@ -152,6 +149,21 @@ static const uint32_t rfswitch_dio_pins_2[] = {
 
 
 
+
+
+
+void set_RF_switch_table(Radio_Number radioNumber)
+{
+
+}
+
+
+
+static const Module::RfSwitchMode_t rfswitch_table_55555[7] = {0};
+
+
+
+#ifndef LRS_DIO_PINS
 static const Module::RfSwitchMode_t rfswitch_table_1[] = {
   // mode                  DIO5  DIO6 DIO7 DIO8
   { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
@@ -165,6 +177,28 @@ static const Module::RfSwitchMode_t rfswitch_table_1[] = {
   { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
   END_OF_MODE_TABLE,
 };
+#endif
+
+#ifdef LRS_DIO_PINS||TRANSMITTER
+  static const Module::RfSwitchMode_t rfswitch_table_1[] = {
+  // mode                  DIO5  DIO6 DIO7 DIO8
+  { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
+  { LR11x0::MODE_RX,     { LOW, LOW, LOW, HIGH} },
+  { LR11x0::MODE_TX,     { LOW, LOW, LOW, LOW } },
+  { LR11x0::MODE_TX_HP,  { LOW, LOW, HIGH, LOW } },
+  
+  
+  { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
+  { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
+  { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
+  END_OF_MODE_TABLE,
+};
+#endif
+
+
+
+
+
 
 #ifdef RADIO_2
 static const Module::RfSwitchMode_t rfswitch_table_2[] = {
@@ -181,9 +215,6 @@ static const Module::RfSwitchMode_t rfswitch_table_2[] = {
 };
 
 #endif
-
-
-
 
 
 
@@ -454,19 +485,18 @@ void radioBeginAll()
 
   
 
-
+  #ifdef LRS_DIO_PINS
   radio1.XTAL = true;
   radio1.setRegulatorDCDC();
   //radio1.setRegulatorLDO();
-  //radio1.setTCXO(0.0, 5000);
+   #endif
   
-  //Инициализируем просто значениями по-умолчанию
-  int state_1 = radio1.begin(config_radio1.frequency, config_radio1.bandwidth, config_radio1.spreadingFactor, config_radio1.codingRate, config_radio1.syncWord, config_radio1.outputPower, config_radio1.preambleLength, 0);
-  //int state_1 = radio1.begin();
+  int state_1 = radio1.begin();
   printRadioBeginResult(state_1, Radio_1);
   WaitOnBusy(Radio_1);
   // radio1.setRfSwitchTable(rfswitch_dio_pins_1, rfswitch_table_1);
   // radio1.setOutputPower(22);
+
 
   #ifdef DEBUG_PRINT
   delay(1000);
@@ -479,6 +509,13 @@ void radioBeginAll()
     //Инициализируем радиотрансивер 2 со значениями по-умолчанию
     Serial.println(" ");
     Serial.println(F("RADIO_2 INIT ...."));
+
+    #ifdef LRS_DIO_PINS
+      radi21.XTAL = true;
+      //radio2.setRegulatorDCDC();
+      //radio2.setRegulatorLDO();
+    #endif
+    
     //Инициализируем просто значениями по-умолчанию
     int state_2 = radio2.begin();
     printRadioBeginResult(state_2, Radio_2);

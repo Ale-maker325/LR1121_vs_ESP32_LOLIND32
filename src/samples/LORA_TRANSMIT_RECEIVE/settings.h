@@ -1,7 +1,7 @@
 #pragma once
 #include <Arduino.h>
 
-#define DEBUG_PRINT
+//#define DEBUG_PRINT
 
 /**
  * @brief Следует раскомментировать одно из определений, а другое закомментировать.
@@ -22,17 +22,22 @@
 
 
 
+
+//#define LRS_DIO_PINS            //раскомментировать, если модуль будет использоваться как простой передатчик
+
+
+
 //**************************************************** Параметры радио для компиляции ************************************************
 
 
 
 //Задаём параметры конфигурации радиотрансивера 1
-#define RADIO_1_FREQ 434
+#define RADIO_1_FREQ 441
 #define RADIO_1_BANDWIDTH 125
 #define RADIO_1_SPREAD_FACTOR 9
 #define RADIO_1_CODING_RATE 7
 #define RADIO_1_SYNC_WORD RADIOLIB_LR11X0_LORA_SYNC_WORD_PRIVATE
-#define RADIO_1_OUTPUT_POWER 10
+#define RADIO_1_OUTPUT_POWER 16
 #define RADIO_1_CURRENT_LIMIT 200
 #define RADIO_1_PREAMBLE_LENGTH 8
 #define RADIO_1_GAIN 0
