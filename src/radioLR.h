@@ -152,12 +152,6 @@ static const uint32_t rfswitch_dio_pins_2[] = {
 
 
 
-// static const uint32_t rfswitch_dio_pins[] = { 
-//   RADIOLIB_LR11X0_DIO7, RADIOLIB_LR11X0_DIO8, RADIOLIB_NC, RADIOLIB_NC,
-//    RADIOLIB_NC
-// };
-
-
 static const Module::RfSwitchMode_t rfswitch_table_1[] = {
   // mode                  DIO5  DIO6 DIO7 DIO8
   { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
@@ -450,12 +444,25 @@ void radioBeginAll()
     Serial.println(F(" INIT....."));
   #endif
 
+  
   #ifdef RADIO_2
   selectRadio(Radio_1);
   #endif
 
+
+
+
+  
+
+
+  radio1.XTAL = true;
+  radio1.setRegulatorDCDC();
+  //radio1.setRegulatorLDO();
+  //radio1.setTCXO(0.0, 5000);
+  
   //Инициализируем просто значениями по-умолчанию
-  int state_1 = radio1.begin();
+  int state_1 = radio1.begin(config_radio1.frequency, config_radio1.bandwidth, config_radio1.spreadingFactor, config_radio1.codingRate, config_radio1.syncWord, config_radio1.outputPower, config_radio1.preambleLength, 0);
+  //int state_1 = radio1.begin();
   printRadioBeginResult(state_1, Radio_1);
   WaitOnBusy(Radio_1);
   // radio1.setRfSwitchTable(rfswitch_dio_pins_1, rfswitch_table_1);

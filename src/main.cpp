@@ -213,7 +213,7 @@ void setup() {
   setRadioMode();
 
   radioBeginAll();
-
+  
   // установить конфигурацию управления радиочастотным переключателем
   radio1.setRfSwitchTable(rfswitch_dio_pins_1, rfswitch_table_1);
   #ifdef RADIO_2
