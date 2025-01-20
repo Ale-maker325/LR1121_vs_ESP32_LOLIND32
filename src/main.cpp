@@ -455,57 +455,70 @@ void loop() {
       
     }
 
-    // check CAD result
-    int state = radio1.getChannelScanResult();
 
-    if (state == RADIOLIB_LORA_DETECTED) {
-      // LoRa packet was detected
-      #ifdef DEBUG_PRINT
-      Serial.println(F("[LR1110] Packet detected!"));
-      #endif
 
-    } else if (state == RADIOLIB_CHANNEL_FREE) {
-      // channel is free
-      #ifdef DEBUG_PRINT
-      Serial.println(F("[LR1110] Channel is free!"));
-      #endif
 
-    } else {
-      // some other error occurred
-      #ifdef DEBUG_PRINT
-      Serial.print(F("[LR1110] Failed, code "));
-      Serial.println(state);
-      #endif
 
-    }
 
-    #ifdef DEBUG_PRINT
-    Serial.println(F("[LR1110] Scanning channel for LoRa transmission ... "));
-    #endif
+    // // check CAD result
+    // int state = radio1.getChannelScanResult();
 
-    // start scanning current channel
-    state = radio1.scanChannel();
+    // if (state == RADIOLIB_LORA_DETECTED) {
+    //   // LoRa packet was detected
+    //   #ifdef DEBUG_PRINT
+    //   Serial.println(F("[LR1110] Packet detected!"));
+    //   #endif
 
-    if (state == RADIOLIB_LORA_DETECTED) {
-      // LoRa preamble was detected
-      #ifdef DEBUG_PRINT
-      Serial.println(F("detected!"));
-      #endif
+    // } else if (state == RADIOLIB_CHANNEL_FREE) {
+    //   // channel is free
+    //   #ifdef DEBUG_PRINT
+    //   Serial.println(F("[LR1110] Channel is free!"));
+    //   #endif
 
-    } else if (state == RADIOLIB_CHANNEL_FREE) {
-      // no preamble was detected, channel is free
-      #ifdef DEBUG_PRINT
-      Serial.println(F("channel is free!"));
-      #endif
+    // } else {
+    //   // some other error occurred
+    //   #ifdef DEBUG_PRINT
+    //   Serial.print(F("[LR1110] Failed, code "));
+    //   Serial.println(state);
+    //   #endif
 
-    } else {
-      // some other error occurred
-      #ifdef DEBUG_PRINT
-      Serial.print(F("failed, code "));
-      Serial.println(state);
-      #endif
+    // }
 
-    }
+
+
+
+
+    // #ifdef DEBUG_PRINT
+    // Serial.println(F("[LR1110] Scanning channel for LoRa transmission ... "));
+    // #endif
+
+    // // start scanning current channel
+    // state = radio1.scanChannel();
+
+    // if (state == RADIOLIB_LORA_DETECTED) {
+    //   // LoRa preamble was detected
+    //   #ifdef DEBUG_PRINT
+    //   Serial.println(F("detected!"));
+    //   #endif
+
+    // } else if (state == RADIOLIB_CHANNEL_FREE) {
+    //   // no preamble was detected, channel is free
+    //   #ifdef DEBUG_PRINT
+    //   Serial.println(F("channel is free!"));
+    //   #endif
+
+    // } else {
+    //   // some other error occurred
+    //   #ifdef DEBUG_PRINT
+    //   Serial.print(F("failed, code "));
+    //   Serial.println(state);
+    //   #endif
+
+    // }
+
+
+
+    
 
 
     #ifdef RADIO_2

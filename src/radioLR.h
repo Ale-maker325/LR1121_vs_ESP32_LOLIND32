@@ -164,59 +164,64 @@ enum MODE_RF
 
 };
 
-void selectMode(MODE_RF MODE, Module::RfSwitchMode_t rfswitch_table)
-{
-  switch (MODE)
-  {
-  case TRANSMITTER_PICO_KIT:
+
+
+
+
+
+// void selectMode(MODE_RF MODE, Module::RfSwitchMode_t *rfswitch_table)
+// {
+//   switch (MODE)
+//   {
+//   case TRANSMITTER_PICO_KIT:
     
-    rfswitch_table = 
-    {
-      // mode                  DIO5  DIO6 DIO7 DIO8
-      { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
-      { LR11x0::MODE_RX,     { LOW, LOW, LOW, HIGH} },
-      { LR11x0::MODE_TX,     { LOW, LOW, LOW, LOW } },
-      { LR11x0::MODE_TX_HP,  { LOW, LOW, HIGH, LOW } },
+//     rfswitch_table = 
+//     {
+//       // mode                  DIO5  DIO6 DIO7 DIO8
+//       { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
+//       { LR11x0::MODE_RX,     { LOW, LOW, LOW, HIGH} },
+//       { LR11x0::MODE_TX,     { LOW, LOW, LOW, LOW } },
+//       { LR11x0::MODE_TX_HP,  { LOW, LOW, HIGH, LOW } },
       
       
-      { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
-      { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
-      { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
-      END_OF_MODE_TABLE,
-    };
-    break;
+//       { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
+//       { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
+//       { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
+//       END_OF_MODE_TABLE,
+//     };
+//     break;
   
-  case RECEIVER_PICO_KIT:
-    /* code */
-    break;
+//   case RECEIVER_PICO_KIT:
+//     /* code */
+//     break;
 
-  case TRANSMITTER_D32:
-    /* code */
-    break;
+//   case TRANSMITTER_D32:
+//     /* code */
+//     break;
 
-  case RECEIVER_D32:
-    /* code */
-    break;
+//   case RECEIVER_D32:
+//     /* code */
+//     break;
   
-  default:
-    break;
-  }
-}
+//   default:
+//     break;
+//   }
+// }
 
-static const Module::RfSwitchMode_t rfswitch_table_55555[7] = {0};
+// static const Module::RfSwitchMode_t rfswitch_table_55555[7] = {0};
 
-void set_RF_switch_table(Radio_Number radioNumber, MODE_RF MODE, Module::RfSwitchMode_t rfswitch_table)
-{
-  switch (radioNumber)
-  {
-  case Radio_1:
-      selectMode(TRANSMITTER_PICO_KIT, rfswitch_table);
-    break;
+// void set_RF_switch_table(Radio_Number radioNumber, MODE_RF MODE, Module::RfSwitchMode_t *rfswitch_table)
+// {
+//   switch (radioNumber)
+//   {
+//   case Radio_1:
+//       selectMode(TRANSMITTER_PICO_KIT, rfswitch_table);
+//     break;
   
-  default:
-    break;
-  }
-}
+//   default:
+//     break;
+//   }
+// }
 
 
 
