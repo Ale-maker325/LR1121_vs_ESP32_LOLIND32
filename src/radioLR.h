@@ -125,7 +125,14 @@ IRAM_ATTR void flag_operationDone_2(void) {
 
 
 
-
+typedef uint8_t Radio_Number;
+enum
+{
+    Radio_NONE = 0b00000000,     // Bit mask for no radio
+    Radio_1    = 0b00000001,     // Bit mask for radio 1
+    Radio_2    = 0b00000010,     // Bit mask for radio 2
+    Radio_All  = 0b00000011      // bit mask for both radios
+};
 
 
 
@@ -148,18 +155,71 @@ static const uint32_t rfswitch_dio_pins_2[] = {
 };
 
 
-
-
-
-
-void set_RF_switch_table(Radio_Number radioNumber)
+enum MODE_RF
 {
+  TRANSMITTER_PICO_KIT,
+  RECEIVER_PICO_KIT,
+  TRANSMITTER_D32,
+  RECEIVER_D32,
 
+};
+
+void selectMode(MODE_RF MODE, Module::RfSwitchMode_t rfswitch_table)
+{
+  switch (MODE)
+  {
+  case TRANSMITTER_PICO_KIT:
+    
+    rfswitch_table = 
+    {
+      // mode                  DIO5  DIO6 DIO7 DIO8
+      { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
+      { LR11x0::MODE_RX,     { LOW, LOW, LOW, HIGH} },
+      { LR11x0::MODE_TX,     { LOW, LOW, LOW, LOW } },
+      { LR11x0::MODE_TX_HP,  { LOW, LOW, HIGH, LOW } },
+      
+      
+      { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
+      { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
+      { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
+      END_OF_MODE_TABLE,
+    };
+    break;
+  
+  case RECEIVER_PICO_KIT:
+    /* code */
+    break;
+
+  case TRANSMITTER_D32:
+    /* code */
+    break;
+
+  case RECEIVER_D32:
+    /* code */
+    break;
+  
+  default:
+    break;
+  }
+}
+
+static const Module::RfSwitchMode_t rfswitch_table_55555[7] = {0};
+
+void set_RF_switch_table(Radio_Number radioNumber, MODE_RF MODE, Module::RfSwitchMode_t rfswitch_table)
+{
+  switch (radioNumber)
+  {
+  case Radio_1:
+      selectMode(TRANSMITTER_PICO_KIT, rfswitch_table);
+    break;
+  
+  default:
+    break;
+  }
 }
 
 
 
-static const Module::RfSwitchMode_t rfswitch_table_55555[7] = {0};
 
 
 
@@ -217,19 +277,6 @@ static const Module::RfSwitchMode_t rfswitch_table_2[] = {
 #endif
 
 
-
-
-
-
-
-typedef uint8_t Radio_Number;
-enum
-{
-    Radio_NONE = 0b00000000,     // Bit mask for no radio
-    Radio_1    = 0b00000001,     // Bit mask for radio 1
-    Radio_2    = 0b00000010,     // Bit mask for radio 2
-    Radio_All  = 0b00000011      // bit mask for both radios
-};
 
 
 
