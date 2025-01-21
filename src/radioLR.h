@@ -73,7 +73,7 @@ void setRadioMode()
   config_radio1.preambleLength = RADIO_1_PREAMBLE_LENGTH;
   config_radio1.gain = RADIO_1_GAIN;
 
-  #ifdef RADIO_2
+  #if RADIO_2 !=-1
   //Задаём параметры конфигурации радиотрансивера 2
   config_radio2.frequency = RADIO_2_FREQ;
   config_radio2.bandwidth = RADIO_2_BANDWIDTH;
@@ -146,6 +146,7 @@ static const uint32_t rfswitch_dio_pins_1[] = {
 };
 
 
+#ifdef RADIO_2
 // set RF switch configuration for Wio WM1110
 // Wio WM1110 uses DIO5 and DIO6 for RF switching
 // NOTE: other boards may be different!
@@ -153,6 +154,10 @@ static const uint32_t rfswitch_dio_pins_2[] = {
   RADIOLIB_LR11X0_DIO5, RADIOLIB_LR11X0_DIO6,
   RADIOLIB_LR11X0_DIO7, RADIOLIB_LR11X0_DIO8, RADIOLIB_NC
 };
+#endif
+
+
+
 
 
 enum MODE_RF
@@ -168,63 +173,14 @@ enum MODE_RF
 
 
 
+static Module::RfSwitchMode_t *rfswitch_table_5 = new Module::RfSwitchMode_t;
 
-// void selectMode(MODE_RF MODE, Module::RfSwitchMode_t *rfswitch_table)
-// {
-//   switch (MODE)
-//   {
-//   case TRANSMITTER_PICO_KIT:
-    
-//     rfswitch_table = 
-//     {
-//       // mode                  DIO5  DIO6 DIO7 DIO8
-//       { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
-//       { LR11x0::MODE_RX,     { LOW, LOW, LOW, HIGH} },
-//       { LR11x0::MODE_TX,     { LOW, LOW, LOW, LOW } },
-//       { LR11x0::MODE_TX_HP,  { LOW, LOW, HIGH, LOW } },
-      
-      
-//       { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
-//       { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
-//       { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
-//       END_OF_MODE_TABLE,
-//     };
-//     break;
+
+boolean set_rf_swith_table(Module::RfSwitchMode_t *rfswitch_table_5)
+{
+  rfswitch_table_5->mode = LR11x0::MODE_STBY;
   
-//   case RECEIVER_PICO_KIT:
-//     /* code */
-//     break;
-
-//   case TRANSMITTER_D32:
-//     /* code */
-//     break;
-
-//   case RECEIVER_D32:
-//     /* code */
-//     break;
-  
-//   default:
-//     break;
-//   }
-// }
-
-// static const Module::RfSwitchMode_t rfswitch_table_55555[7] = {0};
-
-// void set_RF_switch_table(Radio_Number radioNumber, MODE_RF MODE, Module::RfSwitchMode_t *rfswitch_table)
-// {
-//   switch (radioNumber)
-//   {
-//   case Radio_1:
-//       selectMode(TRANSMITTER_PICO_KIT, rfswitch_table);
-//     break;
-  
-//   default:
-//     break;
-//   }
-// }
-
-
-
+}
 
 
 
@@ -280,6 +236,11 @@ static const Module::RfSwitchMode_t rfswitch_table_2[] = {
 };
 
 #endif
+
+
+
+
+
 
 
 
@@ -459,7 +420,7 @@ void printRadioBeginResult(int &STATE, Radio_Number radio_number)
   } else {
 
     String str = "ERROR " + (String)STATE;
-    #ifdef DEBUG_PRINT
+    #if DEBUG_PRINT !=-1
     print_to_terminal_radio_state(radio_name, str);
     #endif
     displayPrintState(x, y, radio_name, str);
@@ -481,7 +442,7 @@ void ICACHE_RAM_ATTR selectRadio(Radio_Number radio_number)
   case Radio_1:
     digitalWrite(NSS_PIN_1, LOW);
     //Если при этом есть и радио 2, то с него снимаем выделение
-    #ifdef RADIO_2
+    #if RADIO_2 !=-1
       digitalWrite(NSS_PIN_2, HIGH);
     #endif
     break;
@@ -489,7 +450,7 @@ void ICACHE_RAM_ATTR selectRadio(Radio_Number radio_number)
   case Radio_2:
     digitalWrite(NSS_PIN_1, HIGH);
     //Если при этом есть и радио 2, то с него снимаем выделение
-    #ifdef RADIO_2
+    #if RADIO_2 !=-1
       digitalWrite(NSS_PIN_2, LOW);
     #endif
     break;
@@ -515,20 +476,20 @@ void ICACHE_RAM_ATTR selectRadio(Radio_Number radio_number)
 void radioBeginAll()
 {
   pinMode(NSS_PIN_1, OUTPUT);
-  #ifdef RADIO_2
+  #if RADIO_2 !=-1
     pinMode(NSS_PIN_2, OUTPUT);
   #endif
   
   //Инициализируем радиотрансивер 1 со значениями по-умолчанию, заданными в
   //структуре LORA_CONFIGURATION
-  #ifdef DEBUG_PRINT
+  #if DEBUG_PRINT !=-1
     Serial.println(" ");
     Serial.print(RADIO_1_NAME);
     Serial.println(F(" INIT....."));
   #endif
 
   
-  #ifdef RADIO_2
+  #if RADIO_2 !=-1
   selectRadio(Radio_1);
   #endif
 
@@ -537,7 +498,7 @@ void radioBeginAll()
 
   
 
-  #ifdef LRS_DIO_PINS
+  #if LRS_DIO_PINS !=-1
   radio1.XTAL = true;
   radio1.setRegulatorDCDC();
   //radio1.setRegulatorLDO();
@@ -554,7 +515,7 @@ void radioBeginAll()
   delay(1000);
   #endif
 
-  #ifdef RADIO_2
+  #if RADIO_2 !=-1
 
     selectRadio(Radio_2);
 
@@ -562,8 +523,8 @@ void radioBeginAll()
     Serial.println(" ");
     Serial.println(F("RADIO_2 INIT ...."));
 
-    #ifdef LRS_DIO_PINS
-      radi21.XTAL = true;
+    #if LRS_DIO_PINS !=-1
+      radio2.XTAL = true;
       //radio2.setRegulatorDCDC();
       //radio2.setRegulatorLDO();
     #endif
@@ -577,7 +538,7 @@ void radioBeginAll()
     // #endif
 
     
-    #ifdef DEBUG_PRINT
+    #if DEBUG_PRINT !=-1
     delay(1000);
     #endif
     

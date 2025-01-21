@@ -16,15 +16,6 @@ TwoWire display_wire = TwoWire(0);
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &display_wire, OLED_RESET); //Создаём объект дисплея
 
-// #ifdef TRANSMITTER
-// String RADIO_1_NAME = F("TX_1");
-// String RADIO_2_NAME = F("TX_2");
-// #endif
-
-// #ifdef RECEIVER
-// String RADIO_1_NAME = F("RX_1");
-// String RADIO_2_NAME = F("RX_2");
-// #endif
 
 
 

@@ -5,10 +5,6 @@
  * @brief Пример работы с модулями LR1121 для ESP32 LOLIN D32. Пример основан на примерах библиотек Adafruit SSD1306 и RadioLib,
  * и рассчитан для применения с дисплеем OLED SSD1306.
  * 
- * Для работы передатчика нужно также определиться, будет он работать как передатчик, либо как приёмник. Для этого необходимо
- * раскомментировать один из дефайнов: #define RECEIVER или #define TRANSMITTER в файле settings.h, который соотчетствует выбранному
- * инвайрменту.
- *  
  */
 
 #include <Arduino.h>
@@ -18,6 +14,9 @@
 #include <radioLR.h>
 #include <settings.h>
 #include <RadioLib.h>
+
+
+
 
 
 
@@ -142,12 +141,12 @@ void radio_setSettings(LR1121 radio, LORA_CONFIGURATION config_radio, String rad
 
   // установить длину преамбулы (допустимый диапазон 6 - 65535)
   if (radio.setPreambleLength(config_radio.preambleLength) == RADIOLIB_ERR_INVALID_PREAMBLE_LENGTH) {
-    #ifdef DEBUG_PRINT
+    #if DEBUG_PRINT !=-1
     Serial.println(F("Selected preamble length is invalid for this module!"));
     #endif
     while (true);
   }
-  #ifdef DEBUG_PRINT
+  #if DEBUG_PRINT !=-1
   Serial.print(F("Set preambleLength = "));
   Serial.println(config_radio.preambleLength);
 
@@ -186,21 +185,21 @@ void radio_setSettings(LR1121 radio, LORA_CONFIGURATION config_radio, String rad
 
 void setup() {
   //Инициализируем сериал-монитор со скоростью 115200
-  #ifdef DEBUG_PRINT
+  #if DEBUG_PRINT !=-1
   Serial.begin(115200);
   #endif
 
   display_wire.begin(I2C_SDA_PIN, I2C_SCL_PIN, 100000);
   SPI_MODEM.begin(SCK_RADIO, MISO_RADIO, MOSI_RADIO);
   
-  #ifdef DEBUG_PRINT
+  #if DEBUG_PRINT !=-1
   Serial.printf("Chip Model %s, ChipRevision %d, Cpu Freq %d, SDK Version %s\n", ESP.getChipModel(), ESP.getChipRevision(), ESP.getCpuFreqMHz(), ESP.getSdkVersion());
   #endif
     
   //инициализируем дисплей
   displayInit();
 
-  #ifdef DEBUG_PRINT
+  #if DEBUG_PRINT !=-1
   Serial.print(TABLE_LEFT);
   Serial.print(F("DISPLAY INIT"));
   Serial.println(TABLE_RIGHT);
@@ -216,18 +215,18 @@ void setup() {
   
   // установить конфигурацию управления радиочастотным переключателем
   radio1.setRfSwitchTable(rfswitch_dio_pins_1, rfswitch_table_1);
-  #ifdef RADIO_2
+  #if RADIO_2 !=-1
   radio2.setRfSwitchTable(rfswitch_dio_pins_2, rfswitch_table_2);
   #endif
 
   
 
   
-  #ifdef DEBUG_PRINT
+  #if DEBUG_PRINT !=-1
   printVersions();
   #endif
 
-  #ifdef DEBUG_PRINT
+  #if DEBUG_PRINT !=-1
   Serial.println(SPACE);
   Serial.println(SPACE);
   #endif
@@ -244,15 +243,15 @@ void setup() {
   
   
   
-  #ifdef RECEIVER   //Если определена работа модуля как приёмника
+  #if RECEIVER  !=-1  //Если определена работа модуля как приёмника
 
     //Устанавливаем функцию, которая будет вызываться при получении пакета данных
     radio1.setPacketReceivedAction(setFlag_1);
-    #ifdef RADIO_2
+    #if RADIO_2 !=-1
     radio2.setPacketReceivedAction(setFlag_2);
     #endif
 
-    #ifdef DEBUG_PRINT
+    #if DEBUG_PRINT !=-1
     //Начинаем слушать есть ли пакеты
     Serial.print(TABLE_LEFT);
     Serial.print(F("[SX1278] Starting to listen RX_1 "));
@@ -261,21 +260,21 @@ void setup() {
 
     state_1 = radio1.startReceive();
     if (state_1 == RADIOLIB_ERR_NONE) {
-      #ifdef DEBUG_PRINT
+      #if DEBUG_PRINT !=-1
       Serial.println(F("success!"));
       Serial.println(SPACE);
       #endif
       digitalWrite(LED_PIN, LOW);     //Включаем светодиод, сигнализация об передаче/приёма пакета
     } else {
-      #ifdef DEBUG_PRINT
+      #if DEBUG_PRINT !=-1
       Serial.print(F("failed, code: "));
       Serial.println(state_1);
       #endif
       while (true);
     }
 
-    #ifdef RADIO_2
-    #ifdef DEBUG_PRINT
+    #if RADIO_2 !=-1
+    #if DEBUG_PRINT !=-1
     //Начинаем слушать есть ли пакеты
     Serial.print(TABLE_LEFT);
     Serial.print(F("[SX1278] Starting to listen RX_2 "));
@@ -284,13 +283,13 @@ void setup() {
 
     state_2 = radio2.startReceive();
     if (state_2 == RADIOLIB_ERR_NONE) {
-      #ifdef DEBUG_PRINT
+      #if DEBUG_PRINT !=-1
       Serial.println(F("success!"));
       Serial.println(SPACE);
       #endif
       digitalWrite(LED_PIN, LOW);     //Включаем светодиод, сигнализация об передаче/приёма пакета
     } else {
-      #ifdef DEBUG_PRINT
+      #if DEBUG_PRINT !=-1
       Serial.print(F("failed, code: "));
       Serial.println(state_2);
       #endif
@@ -307,17 +306,17 @@ void setup() {
 
 
 
-  #ifdef TRANSMITTER   //Если определена работа модуля как передатчика
+  #if TRANSMITTER !=-1  //Если определена работа модуля как передатчика
 
     //Устанавливаем функцию, которая будет вызываться при отправке пакета данных модемом №1
     radio1.setPacketSentAction(flag_operationDone_1);
-    #ifdef RADIO_2
+    #if RADIO_2 !=-1
     //Устанавливаем функцию, которая будет вызываться при отправке пакета данных модемом №2
     radio2.setPacketSentAction(flag_operationDone_2);
     #endif
 
 
-    #ifdef DEBUG_PRINT
+    #if DEBUG_PRINT !=-1
     //Начинаем передачу пакетов
     Serial.print(TABLE_LEFT);
     Serial.print(F("SENDING FIRST PACKET"));
@@ -328,19 +327,19 @@ void setup() {
     transmit_and_print_data(str);
     
     digitalWrite(LED_PIN, LOW);     //Включаем светодиод, сигнализация об передаче/приёма пакета
-    #ifdef DEBUG_PRINT
+    #if DEBUG_PRINT !=-1
     delay(1000);
     #endif
 
   #endif
   
-  #ifdef DEBUG_PRINT
+  #if DEBUG_PRINT !=-1
   Serial.println(F("**************************************"));
   #endif
 
   digitalWrite(LED_PIN, HIGH);      //Выключаем светодиод, сигнализация об окончании передачи/приёма пакета
 
-  #ifdef TRANSMITTER
+  #if TRANSMITTER !=-1
   //Если мощность усилителя передатчика больше 200 милливат (вы можете установить своё значение),
   // и вентилятор охлаждения не включен, то включаем вентилятор охлаждения
   if(config_radio1.outputPower > 1 && FUN_IS_ON != true)
@@ -355,7 +354,7 @@ void setup() {
 
 
 
-  #ifdef DEBUG_PRINT
+  #if DEBUG_PRINT !=-1
   Serial.println(" ");
   #endif
 }
