@@ -11,7 +11,6 @@
 
 
 
-
 int state_1 = RADIOLIB_ERR_NONE; // Переменная, хранящая код состояния передачи/приёма
 int state_2 = RADIOLIB_ERR_NONE; // Переменная, хранящая код состояния передачи/приёма
 
@@ -173,6 +172,18 @@ enum MODE_RF
 
 
 
+
+
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 static Module::RfSwitchMode_t *rfswitch_table_5 = new Module::RfSwitchMode_t;
 
 
@@ -181,6 +192,65 @@ boolean set_rf_swith_table(Module::RfSwitchMode_t *rfswitch_table_5)
   rfswitch_table_5->mode = LR11x0::MODE_STBY;
   
 }
+
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+struct student *addStudent(char *name, unsigned int age, unsigned int course);
+
+struct student {
+    char name[50];
+    unsigned int age;
+    unsigned int course;
+};
+
+
+struct student *st[20];
+
+
+
+// struct student *addStudent(char *name, unsigned int age, unsigned int course) {
+//     struct student *res_st = malloc(sizeof(struct student));
+//     strcpy(res_st->name, name);
+//     res_st->age = age;
+//     res_st->course = course;
+
+//     return res_st;
+// }
+
+struct student *addStudent(char *name, unsigned int age, unsigned int course) {
+    auto *res_st = new student;
+    strcpy(res_st->name, name);
+    res_st->age = age;
+    res_st->course = course;
+
+    return res_st;
+}
+
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
 
 
 
@@ -229,7 +299,7 @@ static const Module::RfSwitchMode_t rfswitch_table_2[] = {
   { LR11x0::MODE_TX,     { LOW, LOW, LOW, LOW } },
   { LR11x0::MODE_TX_HP,  { LOW, LOW, LOW, LOW } },
 
-  { LR11x0::MODE_TX_HF,  { LOW,  LOW, HIGH,  LOW  } },
+  { LR11x0::MODE_TX_HF,  { LOW,  LOW, HIGH,  HIGH  } },
   { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
   { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
   END_OF_MODE_TABLE,
