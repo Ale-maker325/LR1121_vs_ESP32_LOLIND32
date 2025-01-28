@@ -3,26 +3,42 @@
 
 #define DEBUG_PRINT
 
-/**
- * @brief Следует раскомментировать одно из определений, а другое закомментировать.
- *  - RADIO_1 - раскомментировать если используется одно радио
- *  - RADIO_2 - раскомментировать в случае если будет два радиомодуля
- */
+// /**
+//  * @brief Следует раскомментировать одно из определений, а другое закомментировать.
+//  *  - RADIO_1 - раскомментировать если используется одно радио
+//  *  - RADIO_2 - раскомментировать в случае если будет два радиомодуля
+//  */
 #define RADIO_1             //Раскомментировать если будет использован только один модем LR1121
-//#define RADIO_2             //Раскомментировать если будет использовано два модема LR1121
+// //#define RADIO_2             //Раскомментировать если будет использовано два модема LR1121
 
 
-/**
- * @brief Выбор режима работы радио при компиляции. Раскомментировать то, что необходимо
- * 
- */
+// /**
+//  * @brief Выбор режима работы радио при компиляции. Раскомментировать то, что необходимо
+//  * 
+//  */
 
-//#define RECEIVER                //раскомментировать, если модуль будет использоваться как простой приёмник
+// //#define RECEIVER                //раскомментировать, если модуль будет использоваться как простой приёмник
 #define TRANSMITTER             //раскомментировать, если модуль будет использоваться как простой передатчик
 
-#define LRS_DIO_PINS            //раскомментировать, если модуль будет использоваться как модуль ЛРС
+// #define LRS_DIO_PINS            //раскомментировать, если модуль будет использоваться как модуль ЛРС
 
 //**************************************************** Параметры радио для компиляции ************************************************
+
+#ifndef RADIO_1
+  #define RADIO_1 -1
+#endif
+
+#ifndef RADIO_2
+  #define RADIO_2 -1
+#endif
+
+#ifndef TRANSMITTER
+  #define TRANSMITTER 1
+#endif
+
+#ifndef RECEIVER
+  #define RECEIVER -1
+#endif
 
 
 
@@ -32,19 +48,19 @@
 #define RADIO_1_SPREAD_FACTOR 9
 #define RADIO_1_CODING_RATE 7
 #define RADIO_1_SYNC_WORD RADIOLIB_LR11X0_LORA_SYNC_WORD_PRIVATE
-#define RADIO_1_OUTPUT_POWER 20
+#define RADIO_1_OUTPUT_POWER 22
 #define RADIO_1_CURRENT_LIMIT 200
 #define RADIO_1_PREAMBLE_LENGTH 8
 #define RADIO_1_GAIN 0
 
-#ifdef RADIO_2
+#if RADIO_2 !=-1
 //Задаём параметры конфигурации радиотрансивера 2
 #define RADIO_2_FREQ 2422
 #define RADIO_2_BANDWIDTH 125
 #define RADIO_2_SPREAD_FACTOR 9
 #define RADIO_2_CODING_RATE 7
 #define RADIO_2_SYNC_WORD RADIOLIB_LR11X0_LORA_SYNC_WORD_PRIVATE
-#define RADIO_2_OUTPUT_POWER 13
+#define RADIO_2_OUTPUT_POWER 10
 #define RADIO_2_CURRENT_LIMIT 100
 #define RADIO_2_PREAMBLE_LENGTH 8
 #define RADIO_2_GAIN 0
@@ -53,17 +69,24 @@
 
 //**************************************************** Параметры радио для компиляции ************************************************
 
-#ifdef TRANSMITTER
+
+#if TRANSMITTER !=-1
 String RADIO_1_NAME = F("TX_1");
 String RADIO_2_NAME = F("TX_2");
 #endif
 
-#ifdef RECEIVER
+#if RECEIVER !=-1
 String RADIO_1_NAME = F("RX_1");
 String RADIO_2_NAME = F("RX_2");
 #endif
 
+#ifndef DEBUG_PRINT
+  #define DEBUG_PRINT -1
+#endif
 
+#ifndef DLRS_DIO_PINS
+  #define DLRS_DIO_PINS -1
+#endif
 
 //*********************************************************************************************************************************** */
 /**
@@ -128,8 +151,8 @@ String RADIO_2_NAME = F("RX_2");
 
 
 /**
- * @brief Пины SPI управления модемами 
- * По-умолчанию выбран SPI - VSPI: 
+ * @brief Пины SPI управления модемом (модемами)
+ * По-умолчанию выбран SPI - VSPI (если конешно пользователь не задаст свои в файле .ini): 
  * _________________________________________________________________________
  *    СПИ	    *      МОСИ	    *      МИСО	    *     СКЛК	    *      КС     *
  *__________________________________________________________________________
@@ -137,6 +160,7 @@ String RADIO_2_NAME = F("RX_2");
  * ___________*_______________*_______________*_______________*_____________*
  *    HSPI	  *    GPIO 13	  *    GPIO 12	  *    GPIO 14	  *    GPIO 15  *
  * ___________*_______________*_______________*_______________*_____________*
+ * 
  */
 #ifndef MOSI_RADIO
   #define MOSI_RADIO 23
