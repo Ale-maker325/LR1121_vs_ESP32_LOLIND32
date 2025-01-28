@@ -1,7 +1,7 @@
 #pragma once
 #include <Arduino.h>
 
-#define DEBUG_PRINT
+//#define DEBUG_PRINT
 
 // /**
 //  * @brief Следует раскомментировать одно из определений, а другое закомментировать.
@@ -24,21 +24,6 @@
 
 //**************************************************** Параметры радио для компиляции ************************************************
 
-#ifndef RADIO_1
-  #define RADIO_1 -1
-#endif
-
-#ifndef RADIO_2
-  #define RADIO_2 -1
-#endif
-
-#ifndef TRANSMITTER
-  #define TRANSMITTER -1
-#endif
-
-#ifndef RECEIVER
-  #define RECEIVER -1
-#endif
 
 
 
@@ -48,14 +33,14 @@
 #define RADIO_1_SPREAD_FACTOR 9
 #define RADIO_1_CODING_RATE 7
 #define RADIO_1_SYNC_WORD RADIOLIB_LR11X0_LORA_SYNC_WORD_PRIVATE
-#define RADIO_1_OUTPUT_POWER 22
+#define RADIO_1_OUTPUT_POWER 17
 #define RADIO_1_CURRENT_LIMIT 200
 #define RADIO_1_PREAMBLE_LENGTH 8
 #define RADIO_1_GAIN 0
 
-#if RADIO_2 !=-1
+#if RADIO_2
 //Задаём параметры конфигурации радиотрансивера 2
-#define RADIO_2_FREQ 2422
+#define RADIO_2_FREQ 2421
 #define RADIO_2_BANDWIDTH 125
 #define RADIO_2_SPREAD_FACTOR 9
 #define RADIO_2_CODING_RATE 7
@@ -70,18 +55,14 @@
 //**************************************************** Параметры радио для компиляции ************************************************
 
 
-#if TRANSMITTER !=-1
+#ifdef TRANSMITTER 
 String RADIO_1_NAME = F("TX_1");
 String RADIO_2_NAME = F("TX_2");
 #endif
 
-#if RECEIVER !=-1
+#ifdef RECEIVER
 String RADIO_1_NAME = F("RX_1");
 String RADIO_2_NAME = F("RX_2");
-#endif
-
-#ifndef DEBUG_PRINT
-  #define DEBUG_PRINT -1
 #endif
 
 #ifndef DLRS_DIO_PINS

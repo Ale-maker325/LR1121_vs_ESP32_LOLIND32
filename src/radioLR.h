@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <settings.h>
 #include <display.h>
+#include <dio_rf_switch.h>
 
 
 
@@ -72,7 +73,7 @@ void setRadioMode()
   config_radio1.preambleLength = RADIO_1_PREAMBLE_LENGTH;
   config_radio1.gain = RADIO_1_GAIN;
 
-  #if RADIO_2 !=-1
+  #ifdef RADIO_2
   //Задаём параметры конфигурации радиотрансивера 2
   config_radio2.frequency = RADIO_2_FREQ;
   config_radio2.bandwidth = RADIO_2_BANDWIDTH;
@@ -250,62 +251,6 @@ struct student *addStudent(char *name, unsigned int age, unsigned int course) {
 
 
 
-
-
-
-
-#ifndef LRS_DIO_PINS
-static const Module::RfSwitchMode_t rfswitch_table_1[] = {
-  // mode                  DIO5  DIO6 DIO7 DIO8
-  { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
-  { LR11x0::MODE_RX,     { LOW, HIGH, HIGH, LOW} },
-  { LR11x0::MODE_TX,     { HIGH, LOW, LOW, LOW } },
-  { LR11x0::MODE_TX_HP,  { HIGH, LOW, LOW, HIGH } },
-  
-  
-  { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
-  { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
-  { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
-  END_OF_MODE_TABLE,
-};
-#endif
-
-#ifdef LRS_DIO_PINS||TRANSMITTER
-  static const Module::RfSwitchMode_t rfswitch_table_1[] = {
-  // mode                  DIO5  DIO6 DIO7 DIO8
-  { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
-  { LR11x0::MODE_RX,     { LOW, LOW, LOW, HIGH} },
-  { LR11x0::MODE_TX,     { LOW, LOW, LOW, LOW } },
-  { LR11x0::MODE_TX_HP,  { LOW, LOW, HIGH, LOW } },
-  
-  
-  { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
-  { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
-  { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
-  END_OF_MODE_TABLE,
-};
-#endif
-
-
-
-
-
-
-#ifdef RADIO_2
-static const Module::RfSwitchMode_t rfswitch_table_2[] = {
-  // mode                  DIO5  DIO6 DIO7 DIO8
-  { LR11x0::MODE_STBY,   { LOW,  LOW, LOW, LOW } },
-  { LR11x0::MODE_RX,     { LOW, LOW, LOW, LOW  } },
-  { LR11x0::MODE_TX,     { LOW, LOW, LOW, LOW } },
-  { LR11x0::MODE_TX_HP,  { LOW, LOW, LOW, LOW } },
-
-  { LR11x0::MODE_TX_HF,  { LOW,  LOW, HIGH,  HIGH  } },
-  { LR11x0::MODE_GNSS,   { LOW,  LOW, LOW,  LOW  } },
-  { LR11x0::MODE_WIFI,   { LOW,  LOW, LOW,  LOW  } },
-  END_OF_MODE_TABLE,
-};
-
-#endif
 
 
 
@@ -490,7 +435,7 @@ void printRadioBeginResult(int &STATE, Radio_Number radio_number)
   } else {
 
     String str = "ERROR " + (String)STATE;
-    #if DEBUG_PRINT !=-1
+    #ifdef DEBUG_PRINT
     print_to_terminal_radio_state(radio_name, str);
     #endif
     displayPrintState(x, y, radio_name, str);
@@ -546,20 +491,20 @@ void ICACHE_RAM_ATTR selectRadio(Radio_Number radio_number)
 void radioBeginAll()
 {
   pinMode(NSS_PIN_1, OUTPUT);
-  #if RADIO_2 !=-1
+  #ifdef RADIO_2
     pinMode(NSS_PIN_2, OUTPUT);
   #endif
   
   //Инициализируем радиотрансивер 1 со значениями по-умолчанию, заданными в
   //структуре LORA_CONFIGURATION
-  #if DEBUG_PRINT !=-1
+  #ifdef DEBUG_PRINT
     Serial.println(" ");
     Serial.print(RADIO_1_NAME);
     Serial.println(F(" INIT....."));
   #endif
 
   
-  #if RADIO_2 !=-1
+  #ifdef RADIO_2
   selectRadio(Radio_1);
   #endif
 
@@ -568,7 +513,7 @@ void radioBeginAll()
 
   
 
-  #if LRS_DIO_PINS !=-1
+  #ifdef LRS_DIO_PINS
   radio1.XTAL = true;
   radio1.setRegulatorDCDC();
   //radio1.setRegulatorLDO();
@@ -585,7 +530,7 @@ void radioBeginAll()
   delay(1000);
   #endif
 
-  #if RADIO_2 !=-1
+  #ifdef RADIO_2
 
     selectRadio(Radio_2);
 
@@ -593,7 +538,7 @@ void radioBeginAll()
     Serial.println(" ");
     Serial.println(F("RADIO_2 INIT ...."));
 
-    #if LRS_DIO_PINS !=-1
+    #ifdef LRS_DIO_PINS
       radio2.XTAL = true;
       //radio2.setRegulatorDCDC();
       //radio2.setRegulatorLDO();
@@ -608,7 +553,7 @@ void radioBeginAll()
     // #endif
 
     
-    #if DEBUG_PRINT !=-1
+    #ifdef DEBUG_PRINT
     delay(1000);
     #endif
     
