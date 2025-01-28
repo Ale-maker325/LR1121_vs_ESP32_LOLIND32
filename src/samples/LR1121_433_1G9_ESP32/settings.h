@@ -33,7 +33,7 @@
 #endif
 
 #ifndef TRANSMITTER
-  #define TRANSMITTER 1
+  #define TRANSMITTER -1
 #endif
 
 #ifndef RECEIVER
