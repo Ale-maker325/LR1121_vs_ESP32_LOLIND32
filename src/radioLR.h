@@ -179,23 +179,28 @@ enum MODE_RF
 
 
 
-
-
-
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-static Module::RfSwitchMode_t *rfswitch_table_5 = new Module::RfSwitchMode_t;
+// static Module::RfSwitchMode_t *rfswitch_table_5 = new Module::RfSwitchMode_t;
 
 
-boolean set_rf_swith_table(Module::RfSwitchMode_t *rfswitch_table_5)
-{
-  rfswitch_table_5->mode = LR11x0::MODE_STBY;
+// boolean set_rf_swith_table(Module::RfSwitchMode_t *rfswitch_table_5)
+// {
+//   rfswitch_table_5->mode = LR11x0::MODE_STBY;
   
-}
+// }
 
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
 
 
 
