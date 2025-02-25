@@ -462,7 +462,7 @@ void ICACHE_RAM_ATTR selectRadio(Radio_Number radio_number)
   case Radio_1:
     digitalWrite(NSS_PIN_1, LOW);
     //Если при этом есть и радио 2, то с него снимаем выделение
-    #if RADIO_2 !=-1
+    #ifdef RADIO_2
       digitalWrite(NSS_PIN_2, HIGH);
     #endif
     break;
@@ -470,7 +470,7 @@ void ICACHE_RAM_ATTR selectRadio(Radio_Number radio_number)
   case Radio_2:
     digitalWrite(NSS_PIN_1, HIGH);
     //Если при этом есть и радио 2, то с него снимаем выделение
-    #if RADIO_2 !=-1
+    #ifdef RADIO_2
       digitalWrite(NSS_PIN_2, LOW);
     #endif
     break;
@@ -550,8 +550,12 @@ void radioBeginAll()
     #endif
     
     //Инициализируем просто значениями по-умолчанию
+    Serial.println(F("Инициализируем просто значениями по-умолчанию ...."));
+    Serial.println(F("begin ...."));
     int state_2 = radio2.begin();
+    Serial.println(F("printRadioBeginResult ...."));
     printRadioBeginResult(state_2, Radio_2);
+    Serial.println(F("WaitOnBusy(Radio_2)..."));
     WaitOnBusy(Radio_2);
     // #ifdef RADIO_2
     //   radio2.setRfSwitchTable(rfswitch_dio_pins_2, rfswitch_table_2);
