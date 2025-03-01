@@ -272,6 +272,11 @@ bool ICACHE_RAM_ATTR WaitOnBusy(Radio_Number radioNumber)
 {
     constexpr uint32_t wtimeoutUS = 1000U;
     uint32_t startTime = 0;
+    #ifdef DEBUG_PRINT
+    Serial.println("");
+    Serial.println("WaitOnBusy.....................");
+    Serial.println("");
+    #endif
 
     while (true)
     {
@@ -299,6 +304,8 @@ bool ICACHE_RAM_ATTR WaitOnBusy(Radio_Number radioNumber)
         if (startTime == 0) startTime = now;
         if ((now - startTime) > wtimeoutUS) return false;
     }
+
+        
 }
 
 
@@ -504,59 +511,62 @@ void radioBeginAll()
   //структуре LORA_CONFIGURATION
   #ifdef DEBUG_PRINT
     Serial.println(" ");
+    Serial.println(F(""));
+    Serial.println(" ");
     Serial.print(RADIO_1_NAME);
     Serial.println(F(" INIT....."));
   #endif
 
-  
   #ifdef RADIO_2
   selectRadio(Radio_1);
   #endif
 
 
-
-
-  
-
   #ifdef LRS_DIO_PINS
   radio1.XTAL = true;
   radio1.setRegulatorDCDC();
   //radio1.setRegulatorLDO();
-   #endif
+  #endif
   
   int state_1 = radio1.begin();
   printRadioBeginResult(state_1, Radio_1);
-  WaitOnBusy(Radio_1);
+
+  // WaitOnBusy(Radio_1);
+  
   // radio1.setRfSwitchTable(rfswitch_dio_pins_1, rfswitch_table_1);
   // radio1.setOutputPower(22);
 
 
   #ifdef DEBUG_PRINT
-  delay(1000);
+  delay(500);
   #endif
 
   #ifdef RADIO_2
 
-    selectRadio(Radio_2);
-
+    #ifdef DEBUG_PRINT
     //Инициализируем радиотрансивер 2 со значениями по-умолчанию
     Serial.println(" ");
     Serial.println(F("RADIO_2 INIT ...."));
+    #endif
+
+    selectRadio(Radio_2);
 
     #ifdef LRS_DIO_PINS
       radio2.XTAL = true;
-      //radio2.setRegulatorDCDC();
+      radio2.setRegulatorDCDC();
       //radio2.setRegulatorLDO();
     #endif
     
-    //Инициализируем просто значениями по-умолчанию
-    Serial.println(F("Инициализируем просто значениями по-умолчанию ...."));
-    Serial.println(F("begin ...."));
+    
     int state_2 = radio2.begin();
+
+    #ifdef DEBUG_PRINT
     Serial.println(F("printRadioBeginResult ...."));
+    #endif
     printRadioBeginResult(state_2, Radio_2);
-    Serial.println(F("WaitOnBusy(Radio_2)..."));
-    WaitOnBusy(Radio_2);
+    
+    // WaitOnBusy(Radio_2);
+    
     // #ifdef RADIO_2
     //   radio2.setRfSwitchTable(rfswitch_dio_pins_2, rfswitch_table_2);
     // #endif
