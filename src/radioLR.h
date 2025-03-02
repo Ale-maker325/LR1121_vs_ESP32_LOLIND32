@@ -171,86 +171,6 @@ enum MODE_RF
 
 
 
-
-
-
-
-
-
-
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-// static Module::RfSwitchMode_t *rfswitch_table_5 = new Module::RfSwitchMode_t;
-
-
-// boolean set_rf_swith_table(Module::RfSwitchMode_t *rfswitch_table_5)
-// {
-//   rfswitch_table_5->mode = LR11x0::MODE_STBY;
-  
-// }
-
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-struct student *addStudent(char *name, unsigned int age, unsigned int course);
-
-struct student {
-    char name[50];
-    unsigned int age;
-    unsigned int course;
-};
-
-
-struct student *st[20];
-
-
-
-// struct student *addStudent(char *name, unsigned int age, unsigned int course) {
-//     struct student *res_st = malloc(sizeof(struct student));
-//     strcpy(res_st->name, name);
-//     res_st->age = age;
-//     res_st->course = course;
-
-//     return res_st;
-// }
-
-struct student *addStudent(char *name, unsigned int age, unsigned int course) {
-    auto *res_st = new student;
-    strcpy(res_st->name, name);
-    res_st->age = age;
-    res_st->course = course;
-
-    return res_st;
-}
-
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-
-
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -528,18 +448,21 @@ void radioBeginAll()
   //radio1.setRegulatorLDO();
   #endif
   
+  
+  radio1.setTCXO(1.6);
+  
   int state_1 = radio1.begin();
   printRadioBeginResult(state_1, Radio_1);
 
-  // WaitOnBusy(Radio_1);
+  WaitOnBusy(Radio_1);
   
   // radio1.setRfSwitchTable(rfswitch_dio_pins_1, rfswitch_table_1);
-  // radio1.setOutputPower(22);
+  
 
 
-  #ifdef DEBUG_PRINT
-  delay(500);
-  #endif
+  // #ifdef DEBUG_PRINT
+  // delay(500);
+  // #endif
 
   #ifdef RADIO_2
 
@@ -557,6 +480,7 @@ void radioBeginAll()
       //radio2.setRegulatorLDO();
     #endif
     
+    radio2.setTCXO(1.6);
     
     int state_2 = radio2.begin();
 
@@ -565,8 +489,8 @@ void radioBeginAll()
     #endif
     printRadioBeginResult(state_2, Radio_2);
     
-    // WaitOnBusy(Radio_2);
-    
+    WaitOnBusy(Radio_2);
+
     // #ifdef RADIO_2
     //   radio2.setRfSwitchTable(rfswitch_dio_pins_2, rfswitch_table_2);
     // #endif
