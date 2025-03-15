@@ -454,7 +454,7 @@ void radioBeginAll()
   int state_1 = radio1.begin();
   printRadioBeginResult(state_1, Radio_1);
 
-  WaitOnBusy(Radio_1);
+  // WaitOnBusy(Radio_1);
   
   // radio1.setRfSwitchTable(rfswitch_dio_pins_1, rfswitch_table_1);
   
@@ -489,7 +489,7 @@ void radioBeginAll()
     #endif
     printRadioBeginResult(state_2, Radio_2);
     
-    WaitOnBusy(Radio_2);
+    // WaitOnBusy(Radio_2);
 
     // #ifdef RADIO_2
     //   radio2.setRfSwitchTable(rfswitch_dio_pins_2, rfswitch_table_2);
