@@ -32,7 +32,7 @@ static const Module::RfSwitchMode_t rfswitch_table_2[] = {
   { LR11x0::MODE_STBY,   { LOW,  LOW,  LOW,  LOW } },
   { LR11x0::MODE_RX,     { LOW,  LOW,  LOW,  LOW } },
   { LR11x0::MODE_TX,     { LOW,  LOW,  LOW,  LOW } },
-  { LR11x0::MODE_TX_HP,  { LOW,  LOW,  LOW,  LOW} },
+  { LR11x0::MODE_TX_HP,  { HIGH,  LOW,  LOW,  LOW} },
   
   
   { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
