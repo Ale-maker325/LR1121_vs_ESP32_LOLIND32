@@ -137,37 +137,30 @@ enum
 
 
 
-// set RF switch configuration for Wio WM1110
-// Wio WM1110 uses DIO5 and DIO6 for RF switching
-// NOTE: other boards may be different!
 static const uint32_t rfswitch_dio_pins_1[] = { 
   RADIOLIB_LR11X0_DIO5, RADIOLIB_LR11X0_DIO6,
   RADIOLIB_LR11X0_DIO7, RADIOLIB_LR11X0_DIO8, RADIOLIB_NC
 };
 
-
 #ifdef RADIO_2
-// set RF switch configuration for Wio WM1110
-// Wio WM1110 uses DIO5 and DIO6 for RF switching
-// NOTE: other boards may be different!
-static const uint32_t rfswitch_dio_pins_2[] = { 
-  RADIOLIB_LR11X0_DIO5, RADIOLIB_LR11X0_DIO6,
-  RADIOLIB_LR11X0_DIO7, RADIOLIB_LR11X0_DIO8, RADIOLIB_NC
-};
+  static const uint32_t rfswitch_dio_pins_2[] = { 
+    RADIOLIB_LR11X0_DIO5, RADIOLIB_LR11X0_DIO6,
+    RADIOLIB_LR11X0_DIO7, RADIOLIB_LR11X0_DIO8, RADIOLIB_NC
+  };
 #endif
 
 
 
 
 
-enum MODE_RF
-{
-  TRANSMITTER_PICO_KIT,
-  RECEIVER_PICO_KIT,
-  TRANSMITTER_D32,
-  RECEIVER_D32,
+// enum MODE_RF
+// {
+//   TRANSMITTER_PICO_KIT,
+//   RECEIVER_PICO_KIT,
+//   TRANSMITTER_D32,
+//   RECEIVER_D32,
 
-};
+// };
 
 
 
@@ -194,7 +187,8 @@ bool ICACHE_RAM_ATTR WaitOnBusy(Radio_Number radioNumber)
     uint32_t startTime = 0;
     #ifdef DEBUG_PRINT
     Serial.println("");
-    Serial.println("WaitOnBusy.....................");
+    Serial.print("WaitOnBusy.....................  ");
+    Serial.println(radioNumber);
     Serial.println("");
     #endif
 
@@ -454,7 +448,7 @@ void radioBeginAll()
   int state_1 = radio1.begin();
   printRadioBeginResult(state_1, Radio_1);
 
-  // WaitOnBusy(Radio_1);
+  WaitOnBusy(Radio_1);
   
   // radio1.setRfSwitchTable(rfswitch_dio_pins_1, rfswitch_table_1);
   
@@ -489,7 +483,7 @@ void radioBeginAll()
     #endif
     printRadioBeginResult(state_2, Radio_2);
     
-    // WaitOnBusy(Radio_2);
+    WaitOnBusy(Radio_2);
 
     // #ifdef RADIO_2
     //   radio2.setRfSwitchTable(rfswitch_dio_pins_2, rfswitch_table_2);

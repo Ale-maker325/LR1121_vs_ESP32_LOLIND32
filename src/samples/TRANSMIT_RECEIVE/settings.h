@@ -37,7 +37,7 @@
 #define RADIO_1_SPREAD_FACTOR 9
 #define RADIO_1_CODING_RATE 7
 #define RADIO_1_SYNC_WORD RADIOLIB_LR11X0_LORA_SYNC_WORD_PRIVATE
-#define RADIO_1_OUTPUT_POWER 15
+#define RADIO_1_OUTPUT_POWER 5
 #define RADIO_1_CURRENT_LIMIT 200
 #define RADIO_1_PREAMBLE_LENGTH 8
 #define RADIO_1_GAIN 0
@@ -152,47 +152,3 @@ String RADIO_2_NAME = F("RX_2");
 #ifndef SCK_RADIO
   #define SCK_RADIO 18
 #endif
-
-
-// _______________________ Пины .................... _______________________
-
-#ifndef UNDEF_PIN
-  #define UNDEF_PIN -1
-#endif
-
-#ifndef xx
-  #define xx -1
-#endif
-
-#ifndef xx
-  #define xx -1
-#endif
-
-#ifndef xx
-  #define xx -1
-#endif
-
-#ifndef xx
-  #define xx -1
-#endif
-
-#ifndef xx
-  #define xx -1
-#endif
-
-#ifndef xx
-  #define xx -1
-#endif
-
-#ifndef xx
-  #define xx -1
-#endif
-
-#ifndef xx
-  #define xx -1
-#endif
-
-#ifndef xx
-  #define xx -1
-#endif
-

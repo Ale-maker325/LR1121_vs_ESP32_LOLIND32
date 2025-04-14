@@ -9,14 +9,14 @@
  * 
  */
 
-
+//"radio_rfsw_ctrl":[15,0,4,12,4,2,0,1],
 
 static const Module::RfSwitchMode_t rfswitch_table_1[] = {
   // mode                  DIO5  DIO6  DIO7  DIO8
   { LR11x0::MODE_STBY,   { LOW,  LOW,  LOW,  LOW } },
-  { LR11x0::MODE_RX,     { LOW,  LOW,  LOW,  LOW } },
-  { LR11x0::MODE_TX,     { LOW,  LOW,  LOW,  LOW } },
-  { LR11x0::MODE_TX_HP,  { HIGH,  LOW,  LOW,  LOW} },
+  { LR11x0::MODE_RX,     { HIGH,  LOW,  LOW,  LOW } },
+  { LR11x0::MODE_TX,     { HIGH,  HIGH,  LOW,  LOW } },     //включает режим маломощного ТХ (ниже 17ДБм)
+  { LR11x0::MODE_TX_HP,  { LOW,  HIGH,  LOW,  LOW} },       //вкллючает режим ТХ с усилением (выше 17ДБм)
   
   
   { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },
@@ -32,7 +32,7 @@ static const Module::RfSwitchMode_t rfswitch_table_2[] = {
   { LR11x0::MODE_STBY,   { LOW,  LOW,  LOW,  LOW } },
   { LR11x0::MODE_RX,     { LOW,  LOW,  LOW,  LOW } },
   { LR11x0::MODE_TX,     { LOW,  LOW,  LOW,  LOW } },
-  { LR11x0::MODE_TX_HP,  { HIGH,  LOW,  LOW,  LOW} },
+  { LR11x0::MODE_TX_HP,  { LOW,  LOW,  LOW,  LOW} },
   
   
   { LR11x0::MODE_TX_HF,  { LOW,  LOW, LOW,  LOW  } },

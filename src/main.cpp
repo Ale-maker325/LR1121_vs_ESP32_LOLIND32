@@ -186,24 +186,24 @@ void radio_setSettings(LR1121 radio, LORA_CONFIGURATION config_radio, String rad
 void setup() {
   //Инициализируем сериал-монитор со скоростью 115200
   #ifdef DEBUG_PRINT
-  Serial.begin(115200);
+    Serial.begin(115200);
   #endif
 
   display_wire.begin(I2C_SDA_PIN, I2C_SCL_PIN, 100000);
   SPI_MODEM.begin(SCK_RADIO, MISO_RADIO, MOSI_RADIO);
   
   #ifdef DEBUG_PRINT
-  Serial.printf("Chip Model %s, ChipRevision %d, Cpu Freq %d, SDK Version %s\n", ESP.getChipModel(), ESP.getChipRevision(), ESP.getCpuFreqMHz(), ESP.getSdkVersion());
+    Serial.printf("Chip Model %s, ChipRevision %d, Cpu Freq %d, SDK Version %s\n", ESP.getChipModel(), ESP.getChipRevision(), ESP.getCpuFreqMHz(), ESP.getSdkVersion());
   #endif
     
   //инициализируем дисплей
   displayInit();
 
   #ifdef DEBUG_PRINT
-  Serial.print(TABLE_LEFT);
-  Serial.print(F("DISPLAY INIT"));
-  Serial.println(TABLE_RIGHT);
-  Serial.println(SPACE);
+    Serial.print(TABLE_LEFT);
+    Serial.print(F("DISPLAY INIT"));
+    Serial.println(TABLE_RIGHT);
+    Serial.println(SPACE);
   #endif
   
   pinMode(LED_PIN, OUTPUT);      //Контакт управления светодиодом (на плате LOLIN D32 он на пине 5)
@@ -216,25 +216,25 @@ void setup() {
   // установить конфигурацию управления радиочастотным переключателем
   radio1.setRfSwitchTable(rfswitch_dio_pins_1, rfswitch_table_1);
   #ifdef RADIO_2
-  radio2.setRfSwitchTable(rfswitch_dio_pins_2, rfswitch_table_2);
+    radio2.setRfSwitchTable(rfswitch_dio_pins_2, rfswitch_table_2);
   #endif
 
   
 
   
   #ifdef DEBUG_PRINT
-  printVersions();
+    printVersions();
   #endif
 
   #ifdef DEBUG_PRINT
-  Serial.println(SPACE);
-  Serial.println(SPACE);
+    Serial.println(SPACE);
+    Serial.println(SPACE);
   #endif
     
   //Устанавливаем наши значения, определённые ранее в структуре config_radio1
   radio_setSettings(radio1, config_radio1, "1");
   #ifdef RADIO_2
-  radio_setSettings(radio2, config_radio2, "2");
+    radio_setSettings(radio2, config_radio2, "2");
   #endif
   
   
