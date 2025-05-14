@@ -437,13 +437,14 @@ void radioBeginAll()
 
 
   #ifdef LRS_DIO_PINS
-  radio1.XTAL = true;
-  radio1.setRegulatorDCDC();
+  //radio1.XTAL = true;
+  //radio1.setRegulatorDCDC();
+  
   //radio1.setRegulatorLDO();
   #endif
   
   
-  radio1.setTCXO(1.6);
+  //radio1.setTCXO(1.6);
   
   int state_1 = radio1.begin();
   printRadioBeginResult(state_1, Radio_1);
@@ -469,12 +470,13 @@ void radioBeginAll()
     selectRadio(Radio_2);
 
     #ifdef LRS_DIO_PINS
-      radio2.XTAL = true;
-      radio2.setRegulatorDCDC();
+      //radio2.XTAL = true;
+      //radio2.setRegulatorDCDC();
+      
       //radio2.setRegulatorLDO();
     #endif
     
-    radio2.setTCXO(1.6);
+    //radio2.setTCXO(1.6);
     
     int state_2 = radio2.begin();
 
