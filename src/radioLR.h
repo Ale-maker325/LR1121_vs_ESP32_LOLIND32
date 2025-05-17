@@ -34,13 +34,13 @@ LR1121 radio2 = new Module(NSS_PIN_2, IRQ_PIN_2, NRST_PIN_2, BUSY_PIN_2, SPI_MOD
 */
 struct LORA_CONFIGURATION
 {
-  float frequency = 434.0;        //Частота работы передатчика (по-умолчанию 434 MHz)
+  float frequency = 441.0;        //Частота работы передатчика (по-умолчанию 434 MHz)
   float bandwidth = 125.0;        //Полоса пропускания (по-умолчанию 125 килогерц)
   uint8_t spreadingFactor = 9;   //Коэффициент расширения (по-умолчанию 9)
   uint8_t codingRate = 7;         //Скорость кодирования (по-умолчанию 7)
   uint8_t syncWord = 0x18;        //Слово синхронизации (по-умолчанию 0х18). ВНИМАНИЕ! Значение 0x34 зарезервировано для сетей LoRaWAN и нежелательно для использования
-  int8_t outputPower = 15;        //Установить выходную мощность (по-умолчанию 10 дБм) (допустимый диапазон -3 - 17 дБм) ПРИМЕЧАНИЕ: значение 20 дБм позволяет работать на большой мощности, но передача рабочий цикл НЕ ДОЛЖЕН ПРЕВЫШАТЬ 1
-  uint8_t currentLimit = 80;      //Установить предел защиты по току (по-умолчанию до 80 мА) (допустимый диапазон 45 - 240 мА) ПРИМЕЧАНИЕ: установить значение 0 для отключения защиты от перегрузки по току
+  int8_t outputPower = 10;        //Установить выходную мощность (по-умолчанию 10 дБм) (допустимый диапазон -3 - 17 дБм) ПРИМЕЧАНИЕ: значение 20 дБм позволяет работать на большой мощности, но передача рабочий цикл НЕ ДОЛЖЕН ПРЕВЫШАТЬ 1
+  uint8_t currentLimit = 100;      //Установить предел защиты по току (по-умолчанию до 80 мА) (допустимый диапазон 45 - 240 мА) ПРИМЕЧАНИЕ: установить значение 0 для отключения защиты от перегрузки по току
   int16_t preambleLength = 8;    //Установить длину преамбулы (по-умолчанию в 8 символов) (допустимый диапазон 6 - 65535)
   uint8_t gain = 0;               //Установить регулировку усилителя (по-умолчанию 1) (допустимый диапазон 1 - 6, где 1 - максимальный рост) ПРИМЕЧАНИЕ: установить значение 0, чтобы включить автоматическую регулировку усиления оставьте в 0, если вы не знаете, что вы делаете
 
@@ -436,28 +436,18 @@ void radioBeginAll()
   #endif
 
 
-  #ifdef LRS_DIO_PINS
+  
   //radio1.XTAL = true;
   //radio1.setRegulatorDCDC();
-  
-  //radio1.setRegulatorLDO();
-  #endif
-  
-  
-  //radio1.setTCXO(1.6);
+  radio1.setRegulatorLDO();  
+  radio1.setTCXO(1.6);
   
   int state_1 = radio1.begin();
   printRadioBeginResult(state_1, Radio_1);
 
   WaitOnBusy(Radio_1);
   
-  // radio1.setRfSwitchTable(rfswitch_dio_pins_1, rfswitch_table_1);
   
-
-
-  // #ifdef DEBUG_PRINT
-  // delay(500);
-  // #endif
 
   #ifdef RADIO_2
 
@@ -469,13 +459,9 @@ void radioBeginAll()
 
     selectRadio(Radio_2);
 
-    #ifdef LRS_DIO_PINS
-      //radio2.XTAL = true;
-      //radio2.setRegulatorDCDC();
-      
-      //radio2.setRegulatorLDO();
-    #endif
-    
+    //radio2.XTAL = true;
+    //radio2.setRegulatorDCDC();
+    //radio2.setRegulatorLDO();
     //radio2.setTCXO(1.6);
     
     int state_2 = radio2.begin();
